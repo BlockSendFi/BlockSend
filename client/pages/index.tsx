@@ -12,9 +12,9 @@ const IndexPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div>
-        <h1>{"BlockSend"}</h1>
-      </div>
+      <h1 className="text-3xl font-bold underline">
+        {"Hello world!"}
+      </h1>
     </div>
   );
 };
