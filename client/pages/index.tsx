@@ -7,7 +7,7 @@ const IndexPage = () => {
   return (
     <div>
       <Head>
-        <title>Blocksend : World Crypto Dimension</title>
+        <title>{"Blocksend : World Crypto Dimension"}</title>
         <meta name="description" content="Send money accross the world" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
