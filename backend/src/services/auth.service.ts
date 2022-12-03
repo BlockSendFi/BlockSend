@@ -25,10 +25,15 @@ export class AuthService {
     };
   }
 
+  async comparePassword(password1, password2) {
+    const passwordMatch = await bcrypt.compare(password1, password2);
+    return passwordMatch;
+  }
+
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
     const passwordEncrypted = await this.encryptPassword(password);
-    if (user && user.password === passwordEncrypted) {
+    if (user && this.comparePassword(user.password, passwordEncrypted)) {
       return user;
     }
     return null;

@@ -1,17 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { ContactService } from '../services/contact.service';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { AuthService } from 'src/services/auth.service';
-import { SignupInput } from 'src/inputs/signup.input';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from '../auth/local-auth.guard';
+import { AuthService } from '../services/auth.service';
+import { SignupInput } from '../inputs/signup.input';
 
 @Controller()
 export class AuthController {
