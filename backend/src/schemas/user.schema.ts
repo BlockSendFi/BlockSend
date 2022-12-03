@@ -15,6 +15,12 @@ export class User {
   @Prop()
   lastName: string;
 
+  @Prop({ type: String, unique: true })
+  email: string;
+
+  @Prop()
+  password: string;
+
   @Prop()
   walletAddresses: string[];
 
