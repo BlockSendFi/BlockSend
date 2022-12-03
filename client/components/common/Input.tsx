@@ -6,15 +6,16 @@ import { ErrorMessage } from '@hookform/error-message';
 const Input: FC<{
   label: string;
   name: string;
+  type?: string
   register: UseFormRegister<FieldValues>;
   errors: Partial<FieldErrorsImpl<{ [x: string]: any; }>>;
   rules?: any;
   placeholder?: string;
-}> = ({ label, register, name, errors, rules = {}, placeholder }) => {
+}> = ({ label, register, name, errors, rules = {}, placeholder, type = "text" }) => {
   return (
     <div className="flex flex-col gap-1 w-[300px]">
       {label && <label className="text-white font-semibold text-sm">{label}</label>}
-      <input className="h-[48px] px-4" {...register(name, rules)} placeholder={placeholder} />
+      <input className="h-[48px] px-4" {...register(name, rules)} placeholder={placeholder} type={type} />
       <ErrorMessage errors={errors} name={name} render={({ message }) => <div className="text-red-500 text-sm">{message}</div>} />
     </div>
   );
