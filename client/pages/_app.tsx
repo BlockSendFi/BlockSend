@@ -1,7 +1,14 @@
 import React, { FC } from 'react';
 import type { AppProps } from 'next/app'
+import {
+  QueryClient,
+  QueryClientProvider,
+} from 'react-query'
 import '../styles/globals.css'
 import Head from 'next/head';
+
+
+const queryClient = new QueryClient()
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return <>
@@ -10,7 +17,9 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <meta name="description" content="Send money accross the world" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <Component {...pageProps} />
+    <QueryClientProvider client={queryClient}>
+      <Component {...pageProps} />
+    </QueryClientProvider>
   </>
 };
 

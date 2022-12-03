@@ -1,17 +1,35 @@
 import React, { FC } from 'react';
 import Button from '../common/Button';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Input from '../common/Input';
+import {
+  useMutation,
+  useQueryClient,
+} from 'react-query'
 import Link from 'next/link';
 import validationRegex from '../../constants/regex.constant';
+import signupMutation from '../../api/signup-mutation.api';
+import ISignupInput from '../../interfaces/signup-input.interface';
+import Loader from '../common/Loader';
 
 const SignupForm: FC = () => {
   const router = useRouter()
+
+  const { mutate, isLoading } = useMutation(signupMutation, {
+    onSuccess: () => {
+      router.push('/app')
+    },
+  })
+
   const { handleSubmit, register, formState: { errors } } = useForm()
 
-  const onSubmit = () => {
-    router.push('/app')
+  const onSubmit = (values: FieldValues) => {
+    mutate(values as ISignupInput)
+  }
+
+  if (isLoading) {
+    return <Loader />
   }
 
   return (
