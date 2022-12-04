@@ -42,7 +42,7 @@ const DetectWallet = () => {
         </div>}
         </div>
       </div>) : (
-        <Button onClick={() => connect()} title="Se connecter" />
+        <Button onClick={() => connect()} title="Connecter mon wallet" />
       )}
     </div>
   );

@@ -12,8 +12,10 @@ export class TransferService {
     @Inject('ContactService') private contactService: ContactService,
   ) { }
 
-  async initTransfer(contactInput, user) {
-    const contact = await this.contactService.getContact(contactInput.contact);
+  async initTransfer(initTransferInput, user) {
+    const contact = await this.contactService.getContact(
+      initTransferInput.contact,
+    );
 
     if (!contact.user.equals(user._id)) {
       throw new UnauthorizedException('Contact does not belong to user');
@@ -21,6 +23,7 @@ export class TransferService {
 
     return new this.transferModel({
       user: user._id,
+      amount: initTransferInput.amount,
       recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber'),
     }).save();
   }
