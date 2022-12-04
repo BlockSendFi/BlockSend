@@ -2,9 +2,9 @@
 pragma solidity ^0.8.9;
 
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IFixedRateWrapper.sol";
 import "./interfaces/ISynthereum.sol";
-import "./interfaces/IERC20.sol";
 
 contract Transfer is Ownable{
     IFixedRateWrapper public  jarvisWrapper;
@@ -39,9 +39,9 @@ contract Transfer is Ownable{
         TRANSFER_STUCKED
     }
 
-    event TransferInitilized(uint remittanceId, uint amount);
-    event TransferStatusChanged(uint remittanceId, TransferStatus currentStatus, string errorMsg);
-    event TransferFinalized(uint remittanceId);
+    event TransferInitilized(uint transferId, uint amount);
+    event TransferStatusChanged(uint transferId, TransferStatus currentStatus, string errorMsg);
+    event TransferFinalized(uint transferId, string tx);
 
     constructor() {
         jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
@@ -58,53 +58,53 @@ contract Transfer is Ownable{
      * @notice 2- Wrap EURe to jEUR
      * @notice 3- Redeem USDC from jEUR
      * @notice Secod Step: Off-Ramp: Using HUB2
-     * @param remittanceId Input parameters for redeeming (see RedeemParams struct)
+     * @param transferId Input parameters for redeeming (see RedeemParams struct)
      * @param amount Input parameters for redeeming (see RedeemParams struct)
      * @return ok a boolean value indicating whether the operation succeeded.
      * 
      * Emits a {TransferStatusChanged} event with the current status of the transfer.
      */
-    function initializeTransfer(uint remittanceId, uint256 amount) external returns (bool ok) {
+    function initializeTransfer(uint transferId, uint256 amount) external returns (bool ok) {
 
-        initilizeTransfer(remittanceId, amount);
+        initilizeTransferData(transferId, amount);
 
-        bool okGetEURe = transferFrom(remittanceId, amount);
+        bool okGetEURe = transferFrom(transferId, amount);
         if(!okGetEURe){
-            TransferStuck(remittanceId, "");
+            TransferStuck(transferId, "");
             return false;
         }
         
         bool okApproveWrap = approveWrap(amount);
         if(!okApproveWrap){
-            TransferStuck(remittanceId, "");
+            TransferStuck(transferId, "");
             return false;
         }
 
-        uint256 amountJEUR = routage_jEURfromEURe(remittanceId, amount);
+        uint256 amountJEUR = routage_jEURfromEURe(transferId, amount);
         if(amountJEUR==0){
-            TransferStuck(remittanceId, "");
+            TransferStuck(transferId, "");
             return false;
         }
         
         bool okApproveRedeem = approveRedeem(amount);
         if(!okApproveRedeem){
-            TransferStuck(remittanceId, "");
+            TransferStuck(transferId, "");
             return false;
         }
 
-        (uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(remittanceId, amountJEUR, amountJEUR);
-        if(collateralRedeemed==0){
-            TransferStuck(remittanceId, "");
+        (uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, amountJEUR);
+        if(collateralRedeemed==0 && feePaid==0){
+            TransferStuck(transferId, "");
             return false;
         }
 
-        bool okTransferToHub2Wallet = transferToHUB2Wallet(remittanceId, collateralRedeemed);
+        bool okTransferToHub2Wallet = transferToHUB2Wallet(transferId, collateralRedeemed);
         if(!okTransferToHub2Wallet){
-            TransferStuck(remittanceId, "");
+            TransferStuck(transferId, "");
             return false;
         }
 
-        finalizeTransfer(remittanceId);
+        finalizeTransfer(transferId, "");
 
         return true;
     }
@@ -117,18 +117,18 @@ contract Transfer is Ownable{
     }
 
     // *********************** Manage Status changed ************************************
-    function initilizeTransfer(uint remittanceId, uint amount) internal{
+    function initilizeTransferData(uint remittanceId, uint amount) internal{
         transfers[remittanceId].sender=msg.sender;
         transfers[remittanceId].amount=amount;
         transfers[remittanceId].status=TransferStatus.INITIALIZED;
         
-        emit TransferStatusChanged(remittanceId, TransferStatus.INITIALIZED, "");
+        emit TransferInitilized(remittanceId, amount);
     }
 
-    function finalizeTransfer(uint remittanceId) internal{
+    function finalizeTransfer(uint remittanceId, string memory transactionCode) internal{
         transfers[remittanceId].status=TransferStatus.FINALIZED;
         
-        emit TransferStatusChanged(remittanceId, TransferStatus.FINALIZED, "");
+        emit TransferFinalized(remittanceId, transactionCode);
     }
 
     function StatusChanged(uint remittanceId, TransferStatus status) internal{
