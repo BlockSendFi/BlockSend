@@ -27,7 +27,7 @@ const DetectWallet = () => {
             {`Cette adresse n'est pas enregistré sur BlockSend. Pour pouvoir faire un nouveau transfert, veuillez `}
           </span>
 
-          <span className="font-bold underline underline-offset-2 cursor-pointer">
+          <span className="font-semibold underline underline-offset-2 cursor-pointer">
             {"l'enregistrer."}
           </span>
         </div>

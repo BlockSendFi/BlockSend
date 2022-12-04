@@ -5,6 +5,7 @@ import Layout from '../components/layouts/Layout';
 import { AuthContext } from '../contexts/auth.context';
 
 import dynamic from 'next/dynamic';
+import MyContacts from '../components/contact/MyContacts';
 
 const DetectWallet = dynamic(() => import('../components/common/DetectWallet'), { ssr: false })
 
@@ -20,7 +21,11 @@ const AppPage = () => {
   return (
     <Layout variant>
       <InnerBlock className="py-8">
-        <DetectWallet />
+        <div className="flex gap-6 flex-col">
+          <DetectWallet />
+
+          <MyContacts />
+        </div>
       </InnerBlock>
     </Layout>
   );

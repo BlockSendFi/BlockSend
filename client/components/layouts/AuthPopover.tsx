@@ -15,7 +15,7 @@ const AuthPopover: FC<{ className?: string }> = ({ className = "" }) => {
     <Popover className={clsx("relative", className)}>
       <Popover.Button>
         <div className={"flex gap-2 items-center relative"}>
-          <div className={`flex-grow text-${color}`}>{"Mon compte"}</div>
+          <div className={`flex-grow font-semibold text-${color}`}>{"Mon compte"}</div>
           <svg
             className={`stroke-${color}`}
             width="12"
