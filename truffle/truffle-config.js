@@ -22,6 +22,11 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true
     },
+    fuji: {
+      provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://avalanche-fuji.infura.io/v3/${process.env.INFURA_ID}`),
+      network_id: 43113,
+      skipDryRun: true
+    }
   },
 
   // Set default mocha options here, use special reporters, etc.
