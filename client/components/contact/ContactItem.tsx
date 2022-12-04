@@ -45,7 +45,7 @@ const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
       recklesslySetUnpreparedArgs: [process.env.NEXT_PUBLIC_BLOCKSEND_CONTRACT, decimalAmount],
     })
     await initializeTransfer.writeAsync?.({
-      recklesslySetUnpreparedArgs: [2, decimalAmount],
+      recklesslySetUnpreparedArgs: [transfer._id, decimalAmount],
     })
     alert('Votre transfert est en cours')
   }
