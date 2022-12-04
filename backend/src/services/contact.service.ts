@@ -7,7 +7,7 @@ import { Contact, ContactDocument } from 'src/schemas/contact.schema';
 export class ContactService {
   constructor(
     @InjectModel(Contact.name) private contactModel: Model<ContactDocument>,
-  ) {}
+  ) { }
 
   createContact(contactInput, user) {
     return new this.contactModel({ ...contactInput, user: user._id }).save();
@@ -15,5 +15,9 @@ export class ContactService {
 
   getMyContacts(user) {
     return this.contactModel.find({ user: user._id }).lean();
+  }
+
+  getContact(contactId) {
+    return this.contactModel.findById(contactId).lean();
   }
 }

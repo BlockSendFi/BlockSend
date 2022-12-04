@@ -12,6 +12,9 @@ export class Recipient {
 
   @Prop()
   lastName: string;
+
+  @Prop()
+  phoneNumber: string;
 }
 
 @Schema({ timestamps: true })
@@ -21,7 +24,7 @@ export class Transfer {
   @Prop({ default: TransferStatus.INITIALIZED })
   status: TransferStatus;
 
-  @Prop()
+  @Prop({ _id: false })
   recipient: Recipient;
 
   @Prop()
