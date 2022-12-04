@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/schemas/user.schema';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     @Inject('UserService') private readonly usersService: UserService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   private async encryptPassword(password) {
     const passwordEncrypted = await bcrypt.hash(password, SALT_ROUNDS);
@@ -32,11 +32,10 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
-    const passwordEncrypted = await this.encryptPassword(password);
-    if (user && this.comparePassword(user.password, passwordEncrypted)) {
-      return user;
-    }
-    return null;
+    if (!user) return null;
+    const isRightPassword = await this.comparePassword(password, user.password);
+    if (!isRightPassword) return null;
+    return user;
   }
 
   async login(user: User) {
@@ -44,6 +43,10 @@ export class AuthService {
   }
 
   async signup(signupInput) {
+    const existingUser = await this.usersService.findOneByEmail(
+      signupInput.email,
+    );
+    if (existingUser) throw new UnauthorizedException('Email already exists');
     const passwordEncrypted = await this.encryptPassword(signupInput.password);
     const params = {
       ...signupInput,
