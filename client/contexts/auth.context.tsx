@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { createContext, useState, ReactElement, useEffect, Dispatch, SetStateAction } from 'react'
+import { createContext, useState, ReactElement, useEffect } from 'react'
 
 interface IProps {
   children: React.ReactNode
@@ -8,7 +8,6 @@ interface IProps {
 interface IContextProps {
   logout: () => void
   login: (userData: { accessToken: string }) => void
-  // setAccessToken: Dispatch<SetStateAction<string | null>>
   accessToken: string | null
   user: string | null
 }
@@ -57,8 +56,6 @@ const AuthContextProvider = ({ children }: IProps): ReactElement => {
     login: (userData: { accessToken: string }) => {
       saveAccessToken(userData.accessToken)
       router.push('/app')
-      // setTimeout(() => {
-      // }, 800)
     },
     user
   }

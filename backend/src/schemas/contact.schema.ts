@@ -18,7 +18,7 @@ export class Contact {
   phoneNumber: string;
 
   @Prop()
-  addedBy: Types.ObjectId;
+  user: Types.ObjectId;
 
   @Prop()
   createdAt: Date;

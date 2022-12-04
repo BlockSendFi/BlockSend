@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { FC, useContext, useEffect } from 'react';
+import React, { FC, useContext } from 'react';
 import LogoText from '../../assets/logo-text.svg';
 import LogoTextBlue from '../../assets/logo-text-blue.svg';
 import clsx from 'clsx'

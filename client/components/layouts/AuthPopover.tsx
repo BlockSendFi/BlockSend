@@ -3,19 +3,19 @@ import { Popover } from '@headlessui/react'
 import { AuthContext } from '../../contexts/auth.context';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import clsx from 'clsx';
 
 const AuthPopover: FC<{ className?: string }> = ({ className = "" }) => {
   const router = useRouter()
   const color = router.pathname === "/app" ? "blue-main" : "white"
-  console.log("🚀 ~ file: AuthPopover.tsx:10 ~ router.pathname", router.pathname)
 
   const { logout } = useContext(AuthContext)
 
   return (
-    <Popover className={className}>
+    <Popover className={clsx("relative", className)}>
       <Popover.Button>
-        <div className={"flex gap-2 items-center"}>
-          <div className={`flex-grow text-${color}`}>{"Mon compte"}</div>
+        <div className={"flex gap-2 items-center relative"}>
+          <div className={`flex-grow font-semibold text-${color}`}>{"Mon compte"}</div>
           <svg
             className={`stroke-${color}`}
             width="12"
@@ -39,7 +39,7 @@ const AuthPopover: FC<{ className?: string }> = ({ className = "" }) => {
             <div
               className="flex items-center hover:bg-gray-100 px-4 py-3"
             >
-              <Link href="/informations">
+              <Link href="/app">
                 {"Mes informations"}
               </Link>
             </div>

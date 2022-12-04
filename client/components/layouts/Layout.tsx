@@ -2,7 +2,11 @@ import React, { FC } from 'react';
 import Hero from './Hero';
 import { Inter } from '@next/font/google'
 
-const inter = Inter({ subsets: ['latin'], weight: '400' })
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', "600", '700'],
+  style: ['normal']
+})
 
 const Layout: FC<{ children: JSX.Element, heroContent?: JSX.Element, variant?: boolean }> = ({ children, heroContent, variant = false }) => {
   return (

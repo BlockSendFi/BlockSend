@@ -4,12 +4,19 @@ import {
   QueryClient,
   QueryClientProvider,
 } from 'react-query'
+import { WagmiConfig, createClient } from 'wagmi'
+import { getDefaultProvider } from 'ethers'
 import '../styles/globals.css'
 import Head from 'next/head';
 import AuthContextProvider from '../contexts/auth.context';
-
+import LayoutContextProvider from '../contexts/layout.context';
 
 const queryClient = new QueryClient()
+
+const client = createClient({
+  autoConnect: true,
+  provider: getDefaultProvider(),
+})
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return <>
@@ -18,11 +25,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <meta name="description" content="Send money accross the world" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <AuthContextProvider>
-      <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
-      </QueryClientProvider>
-    </AuthContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiConfig client={client}>
+        <AuthContextProvider>
+          <LayoutContextProvider>
+            <Component {...pageProps} />
+          </LayoutContextProvider>
+        </AuthContextProvider>
+      </WagmiConfig>
+    </QueryClientProvider>
   </>
 };
 
