@@ -1,17 +1,25 @@
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 import Button from '../common/Button';
-import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
+import { FieldValues, useForm } from 'react-hook-form';
 import Input from '../common/Input';
 import Link from 'next/link';
+import { useMutation } from 'react-query'
 import validationRegex from '../../constants/regex.constant';
+import loginMutation from '../../api/login-mutation.api';
+import { AuthContext } from '../../contexts/auth.context';
+import ILoginInput from '../../interfaces/login-input.interface';
 
 const LoginForm: FC = () => {
-  const router = useRouter()
   const { handleSubmit, register, formState: { errors } } = useForm()
 
-  const onSubmit = () => {
-    router.push('/app')
+  const { login } = useContext(AuthContext)
+
+  const { mutate, isError, isLoading } = useMutation(loginMutation, {
+    onSuccess: (data) => login(data.data)
+  })
+
+  const onSubmit = (values: FieldValues) => {
+    mutate(values as ILoginInput)
   }
 
   return (
@@ -28,12 +36,16 @@ const LoginForm: FC = () => {
           label="Mot de passe" register={register} name="password" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre mot de passe" />
       </div>
 
-      <Link href="/signup" className="text-white text-sm underline text-right">
+      <Link href="/signup" className="text-white underline text-right underline-offset-2">
         {"Pas encore de compte ?"}
       </Link>
 
+      {
+        isError && <div className="text-red-500 mt-2">{"Email ou mot de passe invalide"}</div>
+      }
+
       <div className="flex justify-end">
-        <Button title="Se connecter" className="items-self-end" type="submit" />
+        <Button title="Se connecter" className="items-self-end" type="submit" loading={isLoading} />
       </div>
     </form>
   );

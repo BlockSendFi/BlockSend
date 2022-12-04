@@ -6,6 +6,7 @@ import {
 } from 'react-query'
 import '../styles/globals.css'
 import Head from 'next/head';
+import AuthContextProvider from '../contexts/auth.context';
 
 
 const queryClient = new QueryClient()
@@ -17,9 +18,11 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <meta name="description" content="Send money accross the world" />
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <QueryClientProvider client={queryClient}>
-      <Component {...pageProps} />
-    </QueryClientProvider>
+    <AuthContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+      </QueryClientProvider>
+    </AuthContextProvider>
   </>
 };
 

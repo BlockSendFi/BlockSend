@@ -1,9 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { FC } from 'react';
+import React, { FC, useContext, useEffect } from 'react';
 import LogoText from '../../assets/logo-text.svg';
+import LogoTextBlue from '../../assets/logo-text-blue.svg';
 import clsx from 'clsx'
+import { AuthContext } from '../../contexts/auth.context';
+import AuthPopover from './AuthPopover';
 
 const MENU_ITEMS = [
   {
@@ -18,22 +21,22 @@ const MENU_ITEMS = [
     title: 'Entreprise',
     url: '/entreprise'
   },
-  {
-    title: 'Se connecter',
-    url: '/login'
-  },
+
 ]
 
 const Navbar: FC<{ variant?: boolean }> = ({ variant = false }) => {
   const router = useRouter()
+  const { accessToken } = useContext(AuthContext)
 
   const onClick = () => {
     router.push('/')
   }
 
+  const Logo = accessToken ? LogoTextBlue : LogoText
+
   return (
     <div className="h-[80px] px-8 flex items-center justify-between">
-      <Image src={LogoText} alt={"BlockSend: Worldwide Remittance"} onClick={onClick} className="cursor-pointer" width={160} />
+      <Image src={Logo} alt={"BlockSend: Worldwide Remittance"} onClick={onClick} className="cursor-pointer" width={160} />
 
       <div className="flex items-center gap-8">
         {
@@ -42,10 +45,25 @@ const Navbar: FC<{ variant?: boolean }> = ({ variant = false }) => {
               className={clsx("font-semibold", {
                 "text-white": !variant,
                 "text-blue-main": variant,
-              })} key={index}>
+              })}
+              key={index}
+            >
               {menuItem.title}
             </Link>
           ))
+        }
+
+        {
+          accessToken ? (<AuthPopover />) : (
+            <Link href={"/login"}
+              className={clsx("font-semibold", {
+                "text-white": !variant,
+                "text-blue-main": variant,
+              })}
+            >
+              {'Se connecter'}
+            </Link>
+          )
         }
       </div>
     </div>
