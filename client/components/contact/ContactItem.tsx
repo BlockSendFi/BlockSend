@@ -4,22 +4,58 @@ import { useMutation, useQueryClient } from 'react-query';
 import initTransferMutation from '../../api/init-transfer-mutation.api';
 import { AuthContext } from '../../contexts/auth.context';
 import IContact from '../../interfaces/contact.interface';
+import ITransfer from '../../interfaces/transfer.interface';
 import Button from '../common/Button';
 import ChevronDownIcon from '../common/icons/ChevronDownIcon';
 import ChevronRightIcon from '../common/icons/ChevronRightIcon';
 import Input from '../common/Input';
+import { useContractWrite } from 'wagmi'
+import ERC20Contract from '../../contracts/ERC20.json';
+import BlockSendTransferContract from '../../contracts/Transfer.json';
+import { utils } from 'ethers';
 
 const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
   const [open, setOpen] = useState(false)
   const { accessToken } = useContext(AuthContext)
   const client = useQueryClient()
 
+
+  const initializeTransfer = useContractWrite({
+    mode: "recklesslyUnprepared",
+    address: process.env.NEXT_PUBLIC_BLOCKSEND_CONTRACT,
+    abi: BlockSendTransferContract.abi,
+    functionName: 'initializeTransfer',
+  })
+
+  const approveEUReRequest = useContractWrite({
+    mode: "recklesslyUnprepared",
+    address: process.env.NEXT_PUBLIC_MONERIUM_EURE_CONTRACT,
+    abi: ERC20Contract.abi,
+    functionName: 'approve',
+  })
+
   const { formState: { errors }, register, handleSubmit, reset } = useForm()
 
+
+  const approveEUReForTransfer = async (transfer: ITransfer) => {
+    // TODO: Get pending transfers transfer and compute the total amount
+    if (!approveEUReRequest.write) return
+    const decimalAmount = utils.parseUnits(transfer.amount.toString(), 18)
+    await approveEUReRequest.writeAsync?.({
+      recklesslySetUnpreparedArgs: [process.env.NEXT_PUBLIC_BLOCKSEND_CONTRACT, decimalAmount],
+    })
+    await initializeTransfer.writeAsync?.({
+      recklesslySetUnpreparedArgs: [transfer._id, decimalAmount],
+    })
+    alert('Votre transfert est en cours')
+  }
+
   const { isLoading, mutate } = useMutation(initTransferMutation, {
-    onSuccess: () => {
-      client.invalidateQueries('myTransfers')
+    onSuccess: (data) => {
       reset()
+      client.invalidateQueries('myTransfers')
+      const transfer = data?.data
+      approveEUReForTransfer(transfer)
     }
   })
 
@@ -28,7 +64,6 @@ const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
   }
 
   return (
-
     <div className="flex flex-col gap-2">
 
       <div className="flex justify-between items-center rounded-2xl border border-gray-200 p-2 cursor-pointer" onClick={() => setOpen(!open)}>
