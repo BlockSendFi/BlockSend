@@ -23,7 +23,7 @@ contract Transfer is Ownable{
 
     // mapping(address => uint) public balanceReceived;
     
-    mapping (uint => Remittance) public transfers;
+    mapping (string => Remittance) public transfers;
     struct Remittance {
         address sender;
         uint amount;
@@ -39,9 +39,9 @@ contract Transfer is Ownable{
         TRANSFER_STUCKED
     }
 
-    event TransferInitilized(uint transferId, uint amount);
-    event TransferStatusChanged(uint transferId, TransferStatus currentStatus, string errorMsg);
-    event TransferFinalized(uint transferId, string tx);
+    event TransferInitilized(string transferId, uint amount);
+    event TransferStatusChanged(string transferId, TransferStatus currentStatus, string errorMsg);
+    event TransferFinalized(string transferId, string tx);
 
     constructor() {
         jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
@@ -64,7 +64,7 @@ contract Transfer is Ownable{
      * 
      * Emits a {TransferStatusChanged} event with the current status of the transfer.
      */
-    function initializeTransfer(uint transferId, uint256 amount) external returns (bool ok) {
+    function initializeTransfer(string memory transferId, uint256 amount) external returns (bool ok) {
 
         initilizeTransferData(transferId, amount);
 
@@ -112,12 +112,12 @@ contract Transfer is Ownable{
     /**
      * Returns the current status of a specific remmitance.
      */
-    function remittanceStatus(uint remittanceId) public view virtual returns (TransferStatus) {
+    function remittanceStatus(string memory remittanceId) public view virtual returns (TransferStatus) {
         return transfers[remittanceId].status;
     }
 
     // *********************** Manage Status changed ************************************
-    function initilizeTransferData(uint remittanceId, uint amount) internal{
+    function initilizeTransferData(string memory remittanceId, uint amount) internal{
         transfers[remittanceId].sender=msg.sender;
         transfers[remittanceId].amount=amount;
         transfers[remittanceId].status=TransferStatus.INITIALIZED;
@@ -125,19 +125,19 @@ contract Transfer is Ownable{
         emit TransferInitilized(remittanceId, amount);
     }
 
-    function finalizeTransfer(uint remittanceId, string memory transactionCode) internal{
+    function finalizeTransfer(string memory remittanceId, string memory transactionCode) internal{
         transfers[remittanceId].status=TransferStatus.FINALIZED;
         
         emit TransferFinalized(remittanceId, transactionCode);
     }
 
-    function StatusChanged(uint remittanceId, TransferStatus status) internal{
+    function StatusChanged(string memory remittanceId, TransferStatus status) internal{
         transfers[remittanceId].status=status;
         
         emit TransferStatusChanged(remittanceId, status, "");
     }
 
-    function TransferStuck(uint remittanceId, string memory errorMsg) internal{
+    function TransferStuck(string memory remittanceId, string memory errorMsg) internal{
         transfers[remittanceId].status=TransferStatus.TRANSFER_STUCKED;
         
         emit TransferStatusChanged(remittanceId, TransferStatus.TRANSFER_STUCKED, errorMsg);
@@ -150,7 +150,7 @@ contract Transfer is Ownable{
         ok = moneriumEURemoney.approve(address(this), amount);
     }
 
-    function transferFrom(uint remittanceId, uint256 amount) internal returns (bool ok){
+    function transferFrom(string memory remittanceId, uint256 amount) internal returns (bool ok){
         ok = moneriumEURemoney.transferFrom(msg.sender, address(this), amount);
 
         StatusChanged(remittanceId, TransferStatus.EURE_RECEIVED);
@@ -163,7 +163,7 @@ contract Transfer is Ownable{
         ok = moneriumEURemoney.approve(WRAPPER_CONTRACT, amount);
     }
 
-    function routage_jEURfromEURe(uint remittanceId, uint256 _collateral) internal returns(uint256 amountTokens){
+    function routage_jEURfromEURe(string memory remittanceId, uint256 _collateral) internal returns(uint256 amountTokens){
         amountTokens = jarvisWrapper.wrap(_collateral, address(this));
 
         StatusChanged(remittanceId, TransferStatus.JEUR_WRAPPED);
@@ -176,7 +176,7 @@ contract Transfer is Ownable{
         ok = jEURToken.approve(SYNTHEREUM_CONTRACT, amount);
     }
 
-    function routage_USDCfromjEUR(uint remittanceId, 
+    function routage_USDCfromjEUR(string memory remittanceId, 
                                     uint256 _numToken, 
                                     uint256 _minCollateral) 
                 internal returns (uint256 collateralRedeemed, uint256 feePaid){
@@ -197,7 +197,7 @@ contract Transfer is Ownable{
     
 
     // *********************** Transfer USDC to HUB2 Wallet ****************************
-    function transferToHUB2Wallet(uint remittanceId, uint256 amount) internal returns ( bool ok ){
+    function transferToHUB2Wallet(string memory remittanceId, uint256 amount) internal returns ( bool ok ){
         ok = uSDCToken.transfer(HUB2_WALLET, amount);
 
         StatusChanged(remittanceId, TransferStatus.USDC_SENT);
