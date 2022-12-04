@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { User } from 'src/schemas/user.schema';
@@ -27,5 +27,14 @@ export class TransferController {
       user,
     );
     return transfer;
+  }
+
+  // TODO: Do not forget to remove this controller
+  @Post('/:transferId/done')
+  async simulateTransferDone(@Param('transferId') transferId: string) {
+    await this.transferService.transferDone(transferId);
+    return {
+      success: true,
+    };
   }
 }

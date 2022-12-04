@@ -31,6 +31,9 @@ export class Transfer {
   recipient: Recipient;
 
   @Prop()
+  user: Types.ObjectId;
+
+  @Prop()
   createdAt: Date;
 
   @Prop()
