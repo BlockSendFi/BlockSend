@@ -1,6 +1,6 @@
 import React, { FC, useContext, useState } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import initTransferMutation from '../../api/init-transfer-mutation.api';
 import { AuthContext } from '../../contexts/auth.context';
 import IContact from '../../interfaces/contact.interface';
@@ -12,11 +12,13 @@ import Input from '../common/Input';
 const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
   const [open, setOpen] = useState(false)
   const { accessToken } = useContext(AuthContext)
+  const client = useQueryClient()
 
   const { formState: { errors }, register, handleSubmit, reset } = useForm()
 
   const { isLoading, mutate } = useMutation(initTransferMutation, {
     onSuccess: () => {
+      client.invalidateQueries('myTransfers')
       reset()
     }
   })
@@ -57,7 +59,7 @@ const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
             <form className="mt-2 flex gap-2 items-end" onSubmit={handleSubmit(initTransfer)}>
               <Input
                 type="number"
-                label="Montant du transfert"
+                label="Montant du transfert en €"
                 register={register}
                 name="amount"
                 errors={errors}

@@ -27,4 +27,8 @@ export class TransferService {
       recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber'),
     }).save();
   }
+
+  async getMyTransfers(user) {
+    return this.transferModel.find({ user: user._id }).lean();
+  }
 }

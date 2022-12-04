@@ -1,9 +1,12 @@
 import React, { FC, useState } from 'react';
 import ITransfer from '../../interfaces/transfer.interface';
 import Button from '../common/Button';
+import dayjs from 'dayjs'
 
 const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
   const [open, setOpen] = useState(false)
+
+  const showDetails = () => null
 
 
   return (
@@ -15,18 +18,19 @@ const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
           </div>
           <div>
             <div className="font-semibold">{`${transfer.recipient.firstName} ${transfer.recipient.lastName} (${transfer.recipient.phoneNumber})`}</div>
-            <div>{`${transfer.amount} €`}</div>
+            <div>
+              <span>
+                {`${transfer.amount || 0} €`}
+              </span>
+
+              <span>{" - "}</span>
+
+              <span className="opacity-60">{`Créé le ${dayjs(transfer.createdAt).format("DD/MM/YYYY HH:mm")}`}</span>
+            </div>
           </div>
         </div>
 
-        {/* {
-          open ? (
-            <ChevronDownIcon className="cursor-pointer" />
-          ) : (
-            <ChevronRightIcon className="cursor-pointer" />
-          )
-        } */}
-        <Button title="Nouveau transfert" onClick={showDetails} color="transparent" />
+        <Button title="Détails" onClick={showDetails} color="transparent" textColor="black" />
       </div>
 
     </div>

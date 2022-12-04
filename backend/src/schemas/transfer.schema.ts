@@ -24,6 +24,9 @@ export class Transfer {
   @Prop({ default: TransferStatus.INITIALIZED })
   status: TransferStatus;
 
+  @Prop({ required: false })
+  amount: number;
+
   @Prop({ _id: false })
   recipient: Recipient;
 
