@@ -1,17 +1,27 @@
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 import Button from '../common/Button';
-import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
+import { FieldValues, useForm } from 'react-hook-form';
 import Input from '../common/Input';
+import {
+  useMutation,
+} from 'react-query'
 import Link from 'next/link';
 import validationRegex from '../../constants/regex.constant';
+import signupMutation from '../../api/signup-mutation.api';
+import ISignupInput from '../../interfaces/signup-input.interface';
+import { AuthContext } from '../../contexts/auth.context';
 
 const SignupForm: FC = () => {
-  const router = useRouter()
+  const { login } = useContext(AuthContext)
+
+  const { mutate, error, isError, isLoading } = useMutation(signupMutation, {
+    onSuccess: (data) => login(data.data)
+  })
+
   const { handleSubmit, register, formState: { errors } } = useForm()
 
-  const onSubmit = () => {
-    router.push('/app')
+  const onSubmit = (values: FieldValues) => {
+    mutate(values as ISignupInput)
   }
 
   return (
@@ -38,12 +48,17 @@ const SignupForm: FC = () => {
           }} placeholder="Votre mot de passe" />
       </div>
 
-      <Link href="/login" className="text-white text-sm underline text-right">
+      <Link href="/login" className="text-white  underline text-right underline-offset-2">
         {"Vous avez déja un compte ?"}
       </Link>
 
+      {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        isError && <div className="text-red-500 mt-2">{(error as any).response.data.message}</div>
+      }
+
       <div className="flex justify-end">
-        <Button title="Se connecter" className="items-self-end" type="submit" />
+        <Button title="Créer mon compte" className="items-self-end" type="submit" loading={isLoading} />
       </div>
     </form>
   );

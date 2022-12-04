@@ -12,6 +12,7 @@ import { AuthController } from './controllers/auth.controller';
 import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { LocalStrategy } from './auth/local.strategy';
 
 @Module({
   imports: [
@@ -48,6 +49,12 @@ import { JwtStrategy } from './auth/jwt.strategy';
     }),
   ],
   controllers: [ContactController, AuthController],
-  providers: [ContactService, UserService, AuthService, JwtStrategy],
+  providers: [
+    ContactService,
+    UserService,
+    AuthService,
+    JwtStrategy,
+    LocalStrategy,
+  ],
 })
-export class AppModule {}
+export class AppModule { }
