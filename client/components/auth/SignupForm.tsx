@@ -27,9 +27,9 @@ const SignupForm: FC = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 justify-end">
       <div className="flex flex-col gap-4">
-        <Input label="Nom" register={register} name="lastName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre nom" />
-        <Input label="Prénom" register={register} name="firstName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre prénom" />
-        <Input label="Email" register={register} name="email" errors={errors}
+        <Input labelClass="text-white" label="Nom" register={register} name="lastName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre nom" />
+        <Input labelClass="text-white" label="Prénom" register={register} name="firstName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre prénom" />
+        <Input labelClass="text-white" label="Email" register={register} name="email" errors={errors}
           rules={{
             required: 'Ce champ est obligatoire',
             pattern: {

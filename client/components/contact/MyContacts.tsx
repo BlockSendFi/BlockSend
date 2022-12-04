@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { useQuery } from 'react-query';
 import getMyContactsQuery from '../../api/get-my-contacts-query.api';
 import { AuthContext } from '../../contexts/auth.context';
+import { LayoutContext } from '../../contexts/layout.context';
+import { ModalEnum } from '../../enums/modal.enum';
 import IContact from '../../interfaces/contact.interface';
 import Button from '../common/Button';
 import Loader from '../common/Loader';
@@ -9,10 +11,10 @@ import ContactItem from './ContactItem';
 
 const MyContacts = () => {
   const { accessToken } = useContext(AuthContext)
-  const { data, isLoading, isError, error } = useQuery("myContacts", () => getMyContactsQuery(accessToken))
-
+  const { openModal } = useContext(LayoutContext)
+  const { data, isLoading, isError, error } = useQuery("myContacts", () => getMyContactsQuery(accessToken as string))
   const contacts = data?.data || []
-  const addContact = () => null
+  const addContact = () => openModal(ModalEnum.ADD_CONTACT)
 
   return (
     <div className="flex flex-col gap-4">
