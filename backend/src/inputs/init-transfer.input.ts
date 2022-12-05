@@ -1,4 +1,4 @@
-import { IsMongoId, IsNumber } from 'class-validator';
+import { IsEthereumAddress, IsMongoId, IsNumber } from 'class-validator';
 
 export class InitTransferInput {
   @IsMongoId()
@@ -6,4 +6,7 @@ export class InitTransferInput {
 
   @IsNumber()
   public amount: number;
+
+  @IsEthereumAddress()
+  public walletAddress: number;
 }

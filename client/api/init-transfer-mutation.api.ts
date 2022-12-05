@@ -3,6 +3,7 @@ import axios from 'axios'
 const initTransferMutation = ({ initTransferInput, accessToken }: {
   initTransferInput: {
     amount: number,
+    walletAddress: string,
     contact: string
   },
   accessToken: string

@@ -19,7 +19,7 @@ export class TransferService {
   constructor(
     @InjectModel(Transfer.name) private transferModel: Model<TransferDocument>,
     @Inject('ContactService') private contactService: ContactService,
-  ) { }
+  ) {}
 
   async initTransfer(initTransferInput, user) {
     const contact = await this.contactService.getContact(
@@ -32,6 +32,7 @@ export class TransferService {
 
     return new this.transferModel({
       user: user._id,
+      userWalletAddress: initTransferInput.walletAddress,
       amount: initTransferInput.amount,
       recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber'),
     }).save();
@@ -75,7 +76,7 @@ export class TransferService {
 
   @Cron('* * * * *')
   async checkPendingTransfers() {
-    console.info('[CRON] Checking pending transfers');
+    this.logger.info('[CRON] Checking pending transfers');
     const networkUrl = `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`;
     const provider = new ethers.providers.JsonRpcProvider(networkUrl);
 
@@ -95,11 +96,12 @@ export class TransferService {
       .lean();
 
     for (const transfer of pendingTransfers) {
-      const balance = await EUReContract.balanceOf(
-        '0x876476aF52Bd7C2184fFf2dE4543356E4Baa56cA',
-      );
+      const balance = await EUReContract.balanceOf(transfer.userWalletAddress);
 
       const balanceInt = parseInt(ethers.utils.formatEther(balance));
+      this.logger.info(
+        `[CRON] wallet ${transfer.userWalletAddress} | balance ${balanceInt} | amount required ${transfer.amount}`,
+      );
 
       if (balanceInt >= transfer.amount) {
         const amountDecimals = ethers.utils.parseUnits(
@@ -108,7 +110,7 @@ export class TransferService {
         );
         await BlockSendContract.initializeTransfer(
           transfer._id,
-          // add user wallet address here
+          // add user wallet address here (transfer.userWalletAddress)
           amountDecimals,
         );
       }
