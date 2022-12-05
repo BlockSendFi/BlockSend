@@ -229,6 +229,10 @@ contract Transfer is Ownable{
     function setEUR_USD_Aggregator(address newAddress) external onlyOwner {
         EUR_USD_AGGREGATOR = newAddress;
     }
+
+    function setBlockSend_Wallet(address newAddress) external onlyOwner {
+        BLOCKSEND_WALLET = newAddress;
+    }
     // *********************************************************************************
 
 
