@@ -6,7 +6,7 @@ import { ContactService } from './contact.service';
 import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { Cron } from '@nestjs/schedule';
 import { Logger } from 'ethers/lib/utils';
 import ERC20ABI from '../contracts/ERC20.json';
@@ -19,7 +19,7 @@ export class TransferService {
   constructor(
     @InjectModel(Transfer.name) private transferModel: Model<TransferDocument>,
     @Inject('ContactService') private contactService: ContactService,
-  ) {}
+  ) { }
 
   async initTransfer(initTransferInput, user) {
     const contact = await this.contactService.getContact(
@@ -85,10 +85,13 @@ export class TransferService {
       ERC20ABI.abi,
       provider,
     );
+
+    const signer = new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY, provider);
+
     const BlockSendContract = new ethers.Contract(
       process.env.BLOCKSEND_ADDRESS,
       BlockSendABI.abi,
-      provider,
+      signer,
     );
 
     const pendingTransfers = await this.transferModel
@@ -104,15 +107,15 @@ export class TransferService {
       );
 
       if (balanceInt >= transfer.amount) {
-        const amountDecimals = ethers.utils.parseUnits(
-          transfer.amount.toString(),
-          18,
-        );
-        await BlockSendContract.initializeTransfer(
-          transfer._id,
-          // add user wallet address here (transfer.userWalletAddress)
-          amountDecimals,
-        );
+        // const amountDecimals = ethers.utils.parseUnits(
+        //   transfer.amount.toString(),
+        //   18,
+        // );
+        // await BlockSendContract.initializeTransfer(
+        //   transfer._id,
+        //   // add user wallet address here (transfer.userWalletAddress)
+        //   amountDecimals,
+        // );
       }
     }
   }
