@@ -18,8 +18,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function () { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function () { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -75,10 +75,10 @@ var TransferService = /** @class */ (function () {
                             throw new common_1.UnauthorizedException('Contact does not belong to user');
                         }
                         return [2 /*return*/, new this.transferModel({
-                                user: user._id,
-                                amount: initTransferInput.amount,
-                                recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber')
-                            }).save()];
+                            user: user._id,
+                            amount: initTransferInput.amount,
+                            recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber')
+                        }).save()];
                 }
             });
         });
@@ -112,15 +112,15 @@ var TransferService = /** @class */ (function () {
                             recipient: transfer.recipient
                         };
                         return [4 /*yield*/, axios_1["default"].post(process.env.HUB2_URL, hub2Params, {
-                                headers: {
-                                    Authorization: "Bearer ".concat(process.env.HUB2_TOKEN)
-                                }
-                            })];
+                            headers: {
+                                Authorization: "Bearer ".concat(process.env.HUB2_TOKEN)
+                            }
+                        })];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, this.transferModel.findByIdAndUpdate(transferId, {
-                                $set: { status: transfer_status_enum_1.TransferStatus.DONE }
-                            })];
+                            $set: { status: transfer_status_enum_1.TransferStatus.DONE }
+                        })];
                     case 3:
                         _a.sent();
                         return [4 /*yield*/, this.transferModel.findById(transferId)];
@@ -138,12 +138,12 @@ var TransferService = /** @class */ (function () {
                         console.info('[CRON] Checking pending transfers');
                         networkUrl = "".concat(process.env.INFURA_NETWORK_ENDPOINT).concat(process.env.INFURA_API_KEY);
                         provider = new ethers_1.ethers.providers.JsonRpcProvider(networkUrl);
-                        signer = new ethers_1.ethers.Wallet(process.env.WALLET_PRIVATE_KEY, provider);
+                        signer = new ethers_1.ethers.Wallet(process.env.SIGNER_PRIVATE_KEY, provider);
                         EUReContract = new ethers_1.ethers.Contract(process.env.MONERIUM_EURE_ADDRESS, ERC20ABI, provider);
                         console.log('signer:', signer.address);
                         return [4 /*yield*/, this.transferModel
-                                .find({ status: transfer_status_enum_1.TransferStatus.INITIALIZED })
-                                .lean()];
+                            .find({ status: transfer_status_enum_1.TransferStatus.INITIALIZED })
+                            .lean()];
                     case 1:
                         pendingTransfers = _a.sent();
                         _i = 0, pendingTransfers_1 = pendingTransfers;

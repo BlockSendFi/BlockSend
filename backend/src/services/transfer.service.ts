@@ -6,7 +6,7 @@ import { ContactService } from './contact.service';
 import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { Cron } from '@nestjs/schedule';
 import { Logger } from 'ethers/lib/utils';
 import ERC20ABI from '../contracts/ERC20.json';
@@ -32,6 +32,7 @@ export class TransferService {
 
     return new this.transferModel({
       user: user._id,
+      userWalletAddress: initTransferInput.walletAddress,
       amount: initTransferInput.amount,
       recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber'),
     }).save();
@@ -75,7 +76,7 @@ export class TransferService {
 
   @Cron('* * * * *')
   async checkPendingTransfers() {
-    console.info('[CRON] Checking pending transfers');
+    this.logger.info('[CRON] Checking pending transfers');
     const networkUrl = `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`;
     const provider = new ethers.providers.JsonRpcProvider(networkUrl);
 
@@ -84,10 +85,13 @@ export class TransferService {
       ERC20ABI.abi,
       provider,
     );
+
+    const signer = new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY, provider);
+
     const BlockSendContract = new ethers.Contract(
       process.env.BLOCKSEND_ADDRESS,
       BlockSendABI.abi,
-      provider,
+      signer,
     );
 
     const pendingTransfers = await this.transferModel
@@ -95,22 +99,23 @@ export class TransferService {
       .lean();
 
     for (const transfer of pendingTransfers) {
-      const balance = await EUReContract.balanceOf(
-        '0x876476aF52Bd7C2184fFf2dE4543356E4Baa56cA',
-      );
+      const balance = await EUReContract.balanceOf(transfer.userWalletAddress);
 
       const balanceInt = parseInt(ethers.utils.formatEther(balance));
+      this.logger.info(
+        `[CRON] wallet ${transfer.userWalletAddress} | balance ${balanceInt} | amount required ${transfer.amount}`,
+      );
 
       if (balanceInt >= transfer.amount) {
-        const amountDecimals = ethers.utils.parseUnits(
-          transfer.amount.toString(),
-          18,
-        );
-        await BlockSendContract.initializeTransfer(
-          transfer._id,
-          // add user wallet address here
-          amountDecimals,
-        );
+        // const amountDecimals = ethers.utils.parseUnits(
+        //   transfer.amount.toString(),
+        //   18,
+        // );
+        // await BlockSendContract.initializeTransfer(
+        //   transfer._id,
+        //   // add user wallet address here (transfer.userWalletAddress)
+        //   amountDecimals,
+        // );
       }
     }
   }
