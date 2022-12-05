@@ -15,9 +15,11 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { LocalStrategy } from './auth/local.strategy';
 import { TransferController } from './controllers/transfer.controller';
 import { TransferService } from './services/transfer.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     PassportModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],

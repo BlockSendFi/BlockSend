@@ -6,9 +6,16 @@ import { ContactService } from './contact.service';
 import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
+import { ethers } from 'ethers';
+import { Cron } from '@nestjs/schedule';
+import { Logger } from 'ethers/lib/utils';
+import ERC20ABI from '../contracts/ERC20.json';
+import BlockSendABI from '../contracts/Transfer.json';
 
 @Injectable()
 export class TransferService {
+  private readonly logger = new Logger(TransferService.name);
+
   constructor(
     @InjectModel(Transfer.name) private transferModel: Model<TransferDocument>,
     @Inject('ContactService') private contactService: ContactService,
@@ -64,5 +71,47 @@ export class TransferService {
     });
 
     return await this.transferModel.findById(transferId);
+  }
+
+  @Cron('* * * * *')
+  async checkPendingTransfers() {
+    console.info('[CRON] Checking pending transfers');
+    const networkUrl = `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`;
+    const provider = new ethers.providers.JsonRpcProvider(networkUrl);
+
+    const EUReContract = new ethers.Contract(
+      process.env.MONERIUM_EURE_ADDRESS,
+      ERC20ABI.abi,
+      provider,
+    );
+    const BlockSendContract = new ethers.Contract(
+      process.env.BLOCKSEND_ADDRESS,
+      BlockSendABI.abi,
+      provider,
+    );
+
+    const pendingTransfers = await this.transferModel
+      .find({ status: TransferStatus.INITIALIZED })
+      .lean();
+
+    for (const transfer of pendingTransfers) {
+      const balance = await EUReContract.balanceOf(
+        '0x876476aF52Bd7C2184fFf2dE4543356E4Baa56cA',
+      );
+
+      const balanceInt = parseInt(ethers.utils.formatEther(balance));
+
+      if (balanceInt >= transfer.amount) {
+        const amountDecimals = ethers.utils.parseUnits(
+          transfer.amount.toString(),
+          18,
+        );
+        await BlockSendContract.initializeTransfer(
+          transfer._id,
+          // add user wallet address here
+          amountDecimals,
+        );
+      }
+    }
   }
 }
