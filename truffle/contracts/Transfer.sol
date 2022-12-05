@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IFixedRateWrapper.sol";
 import "./interfaces/ISynthereum.sol";
 
 contract Transfer is Ownable{
+
+    AggregatorV3Interface internal priceFeed;
+
     IFixedRateWrapper public  jarvisWrapper;
     ISynthereum public jarvisSynthereum;
 
@@ -20,6 +24,8 @@ contract Transfer is Ownable{
     address private JEUR_TOKEN_CONTRACT = 0xEf9cbDbC2e396a01D7658AdEc548C1211b443642;
     address private USDC_TOKEN_CONTRACT = 0x5425890298aed601595a70AB815c96711a31Bc65;
     address private HUB2_WALLET = 0x64568cfc9122104a4B23ABf67830873BE66Fc3D8;
+    address private EUR_USD_AGGREGATOR = 0x73366Fe0AA0Ded304479862808e02506FE556a98;
+    address private BLOCKSEND_WALLET = 0x64568cfc9122104a4B23ABf67830873BE66Fc3D8;
 
     // mapping(address => uint) public balanceReceived;
     
@@ -49,6 +55,7 @@ contract Transfer is Ownable{
         moneriumEURemoney = IERC20(EURE_TOKEN_CONTRACT);
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
         uSDCToken = IERC20(USDC_TOKEN_CONTRACT);
+        priceFeed = AggregatorV3Interface(EUR_USD_AGGREGATOR);
     }
 
     /**
@@ -56,7 +63,8 @@ contract Transfer is Ownable{
      * @notice First Step: On-Ramp: 
      * @notice 1- Transfer EURe from user's wallet
      * @notice 2- Wrap EURe to jEUR
-     * @notice 3- Redeem USDC from jEUR
+     * @notice 3- Get jEUR/USDC Rate
+     * @notice 4- Redeem USDC from jEUR
      * @notice Secod Step: Off-Ramp: Using HUB2
      * @param transferId Input parameters for redeeming (see RedeemParams struct)
      * @param amount Input parameters for redeeming (see RedeemParams struct)
@@ -64,36 +72,27 @@ contract Transfer is Ownable{
      * 
      * Emits a {TransferStatusChanged} event with the current status of the transfer.
      */
-    function initializeTransfer(string memory transferId, uint256 amount) external returns (bool ok) {
+    function initializeTransfer(string calldata transferId, address userWallet, uint256 amount) external returns (bool ok) {
 
         initilizeTransferData(transferId, amount);
 
-        bool okGetEURe = transferFrom(transferId, amount);
+        bool okGetEURe = transferFrom(transferId, userWallet, amount);
         if(!okGetEURe){
             TransferStuck(transferId, "");
             return false;
         }
-        
-        bool okApproveWrap = approveWrap(amount);
-        if(!okApproveWrap){
+
+        (bool okApproveWrap, uint256 amountJEUR) = routage_jEURfromEURe(transferId, amount, amount);
+        if(okApproveWrap && amountJEUR==0){
             TransferStuck(transferId, "");
             return false;
         }
 
-        uint256 amountJEUR = routage_jEURfromEURe(transferId, amount);
-        if(amountJEUR==0){
-            TransferStuck(transferId, "");
-            return false;
-        }
-        
-        bool okApproveRedeem = approveRedeem(amount);
-        if(!okApproveRedeem){
-            TransferStuck(transferId, "");
-            return false;
-        }
+        uint price = getLatestPrice();        
+        uint collateralUSDC = (amountJEUR/10e8)*price; 
 
-        (uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, amountJEUR);
-        if(collateralRedeemed==0 && feePaid==0){
+        (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
+        if(okApprouveJEUR && okApprouveUSDC && collateralRedeemed==0 && feePaid==0){
             TransferStuck(transferId, "");
             return false;
         }
@@ -112,75 +111,72 @@ contract Transfer is Ownable{
     /**
      * Returns the current status of a specific remmitance.
      */
-    function remittanceStatus(string memory remittanceId) public view virtual returns (TransferStatus) {
-        return transfers[remittanceId].status;
+    function remittanceStatus(string calldata transferId) public view virtual returns (TransferStatus) {
+        return transfers[transferId].status;
     }
 
     // *********************** Manage Status changed ************************************
-    function initilizeTransferData(string memory remittanceId, uint amount) internal{
-        transfers[remittanceId].sender=msg.sender;
-        transfers[remittanceId].amount=amount;
-        transfers[remittanceId].status=TransferStatus.INITIALIZED;
+    function initilizeTransferData(string calldata transferId, uint amount) internal{
+        transfers[transferId].sender=msg.sender;
+        transfers[transferId].amount=amount;
+        transfers[transferId].status=TransferStatus.INITIALIZED;
         
-        emit TransferInitilized(remittanceId, amount);
+        emit TransferInitilized(transferId, amount);
     }
 
-    function finalizeTransfer(string memory remittanceId, string memory transactionCode) internal{
-        transfers[remittanceId].status=TransferStatus.FINALIZED;
+    function finalizeTransfer(string calldata transferId, string memory transactionCode) internal{
+        transfers[transferId].status=TransferStatus.FINALIZED;
         
-        emit TransferFinalized(remittanceId, transactionCode);
+        emit TransferFinalized(transferId, transactionCode);
     }
 
-    function StatusChanged(string memory remittanceId, TransferStatus status) internal{
-        transfers[remittanceId].status=status;
+    function StatusChanged(string calldata transferId, TransferStatus status) internal{
+        transfers[transferId].status=status;
         
-        emit TransferStatusChanged(remittanceId, status, "");
+        emit TransferStatusChanged(transferId, status, "");
     }
 
-    function TransferStuck(string memory remittanceId, string memory errorMsg) internal{
-        transfers[remittanceId].status=TransferStatus.TRANSFER_STUCKED;
+    function TransferStuck(string calldata transferId, string memory errorMsg) internal{
+        transfers[transferId].status=TransferStatus.TRANSFER_STUCKED;
         
-        emit TransferStatusChanged(remittanceId, TransferStatus.TRANSFER_STUCKED, errorMsg);
+        emit TransferStatusChanged(transferId, TransferStatus.TRANSFER_STUCKED, errorMsg);
     }
     // *********************************************************************************
 
 
     // *********************** GET EURe from user's wallet *****************************
-    function approveTransferEURe(uint256 amount) external returns (bool ok){
-        ok = moneriumEURemoney.approve(address(this), amount);
+    function approveTransferEURe(address userWallet, uint256 amount) external returns (bool ok){
+        ok = moneriumEURemoney.approve(userWallet, amount);
     }
 
-    function transferFrom(string memory remittanceId, uint256 amount) internal returns (bool ok){
-        ok = moneriumEURemoney.transferFrom(msg.sender, address(this), amount);
+    function transferFrom(string calldata transferId, address userWallet, uint256 amount) internal returns (bool ok){
+        ok = moneriumEURemoney.transferFrom(userWallet, BLOCKSEND_WALLET, amount);
 
-        StatusChanged(remittanceId, TransferStatus.EURE_RECEIVED);
+        StatusChanged(transferId, TransferStatus.EURE_RECEIVED);
     }
     // *********************************************************************************
     
 
     // *********************** Wrap EURe to JEUR ***************************************
-    function approveWrap(uint256 amount) internal returns (bool ok){
+    function routage_jEURfromEURe(string calldata transferId, uint256 amount, uint256 collateral) internal returns(bool ok, uint256 amountTokens){
+        
         ok = moneriumEURemoney.approve(WRAPPER_CONTRACT, amount);
-    }
+        amountTokens = jarvisWrapper.wrap(collateral, address(this));
 
-    function routage_jEURfromEURe(string memory remittanceId, uint256 _collateral) internal returns(uint256 amountTokens){
-        amountTokens = jarvisWrapper.wrap(_collateral, address(this));
-
-        StatusChanged(remittanceId, TransferStatus.JEUR_WRAPPED);
+        StatusChanged(transferId, TransferStatus.JEUR_WRAPPED);
     }
     // *********************************************************************************
     
 
     // *********************** Wurn & Mint (Redeem) UCDS from JEUR *********************
-    function approveRedeem(uint256 amount) internal returns (bool ok){
-        ok = jEURToken.approve(SYNTHEREUM_CONTRACT, amount);
-    }
-
-    function routage_USDCfromjEUR(string memory remittanceId, 
+    function routage_USDCfromjEUR(string calldata transferId, 
                                     uint256 _numToken, 
                                     uint256 _minCollateral) 
-                internal returns (uint256 collateralRedeemed, uint256 feePaid){
+                internal returns (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid){
         
+        okApprouveJEUR = jEURToken.approve(SYNTHEREUM_CONTRACT, _numToken);
+        okApprouveUSDC = uSDCToken.approve(SYNTHEREUM_CONTRACT, _minCollateral);
+
         ISynthereum.RedeemParams memory params =
             ISynthereum.RedeemParams({
                 numTokens: _numToken,
@@ -191,18 +187,19 @@ contract Transfer is Ownable{
  
         (collateralRedeemed, feePaid) = jarvisSynthereum.redeem(params);
         
-        StatusChanged(remittanceId, TransferStatus.USDC_RECEIVED);
+        StatusChanged(transferId, TransferStatus.USDC_RECEIVED);
     }
     // *********************************************************************************
     
 
     // *********************** Transfer USDC to HUB2 Wallet ****************************
-    function transferToHUB2Wallet(string memory remittanceId, uint256 amount) internal returns ( bool ok ){
+    function transferToHUB2Wallet(string calldata transferId, uint256 amount) internal returns ( bool ok ){
         ok = uSDCToken.transfer(HUB2_WALLET, amount);
 
-        StatusChanged(remittanceId, TransferStatus.USDC_SENT);
+        StatusChanged(transferId, TransferStatus.USDC_SENT);
     }
     // *********************************************************************************
+
 
     // *********************** Update Contracts Addresses ******************************
     function setWrapperContract(address newAddress) external onlyOwner {
@@ -228,11 +225,17 @@ contract Transfer is Ownable{
     function setHUB2Wallet(address newAddress) external onlyOwner {
         HUB2_WALLET = newAddress;
     }
-    // *********************************************************************************
-    
 
-    // receive() external payable {
-    //     assert(balanceReceived[msg.sender] + msg.value >= balanceReceived[msg.sender]);
-    //     balanceReceived[msg.sender] += msg.value;
-    // }
+    function setEUR_USD_Aggregator(address newAddress) external onlyOwner {
+        EUR_USD_AGGREGATOR = newAddress;
+    }
+    // *********************************************************************************
+
+
+    // *********************** Get the latest rate *************************************
+    function getLatestPrice() public view returns (uint) {
+        (, int price , , ,) = priceFeed.latestRoundData();
+        return uint(price/100);
+    }
+    // *********************************************************************************
 }
