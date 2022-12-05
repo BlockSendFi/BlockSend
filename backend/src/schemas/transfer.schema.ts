@@ -31,6 +31,9 @@ export class Transfer {
   recipient: Recipient;
 
   @Prop()
+  userWallet: string;
+
+  @Prop()
   user: Types.ObjectId;
 
   @Prop()
