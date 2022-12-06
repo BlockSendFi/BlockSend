@@ -8,9 +8,9 @@ const DetectWallet = () => {
   const { chain } = useNetwork()
   const chainId = parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string)
   const wrongNetwork = chain?.id !== chainId
+  const { address, isConnected } = useAccount()
   const { switchNetwork } = useSwitchNetwork()
 
-  const { address, isConnected } = useAccount()
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   })
