@@ -16,6 +16,7 @@ import { Cron } from '@nestjs/schedule';
 import { Logger } from 'ethers/lib/utils';
 import ERC20ABI from '../contracts/ERC20.json';
 import BlockSendABI from '../contracts/Transfer.json';
+import { UserService } from './user.service';
 
 @Injectable()
 export class TransferService implements OnApplicationBootstrap {
@@ -29,6 +30,7 @@ export class TransferService implements OnApplicationBootstrap {
   constructor(
     @InjectModel(Transfer.name) private transferModel: Model<TransferDocument>,
     @Inject('ContactService') private contactService: ContactService,
+    @Inject('UserService') private userService: UserService,
   ) {
     const networkUrl = `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`;
     this.provider = new ethers.providers.JsonRpcProvider(networkUrl);
@@ -71,9 +73,19 @@ export class TransferService implements OnApplicationBootstrap {
     );
   }
 
-  private onTransferFinalized(transferId, transactionCode) {
+  private onTransferFinalized(
+    transferId,
+    offchainTransferTx,
+    amountWithoutFees,
+  ) {
     this.logger.info(
-      `Transfer ${transferId} finalized (transactionCode : ${transactionCode})`,
+      `Transfer ${transferId} finalized (offchainTransferTx : ${offchainTransferTx})`,
+    );
+
+    this.setTransferOnChainCompleted(
+      transferId,
+      offchainTransferTx,
+      amountWithoutFees,
     );
   }
 
@@ -144,36 +156,71 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  async transferDone(transferId) {
-    const transfer = await this.transferModel.findById(transferId);
+  private async notifyOffchainProvider(transfer) {
+    const user = await this.userService.getUser(transfer.user);
+    const offchainProviderParams = {
+      mode: 'live',
+      amount: transfer.amountWithoutFees,
+      transferTx: transfer.offchainTransferTx,
+      destination: transfer.recipient,
+      origin: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        country: 'FR',
+      },
+    };
 
-    if (transfer.status === TransferStatus.DONE) {
+    try {
+      const response = await axios.post(
+        process.env.OFFCHAIN_PROVIDER_URL,
+        offchainProviderParams,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.OFFCHAIN_PROVIDER_SECRET}`,
+          },
+        },
+      );
+      await this.transferModel
+        .findOneAndUpdate(transfer._id, {
+          $set: {
+            status: TransferStatus.OFFRAMP_INIT,
+            offchainProviderTrackingId: response.data.trackingId,
+          },
+        })
+        .exec();
+    } catch (error) {
+      this.logger.info(
+        `Failed to notify offchain provider for transfer ${transfer._id}`,
+      );
+    }
+  }
+
+  async setTransferOnChainCompleted(
+    transferId,
+    offchainTransferTx,
+    amountWithoutFees,
+  ) {
+    const transfer = await this.transferModel.findById(transferId);
+    if (transfer.status === TransferStatus.OFFRAMP_COMPLETED) {
       return;
     }
 
-    const hub2Params = {
-      transferTx:
-        '0x0000000000000000000000000000000000000000000000000000000000000000',
-      amount: 200,
-      account: {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '+123456789',
-      },
-      recipient: transfer.recipient,
-    };
-
-    await axios.post(process.env.HUB2_URL, hub2Params, {
-      headers: {
-        Authorization: `Bearer ${process.env.HUB2_TOKEN}`,
-      },
-    });
-
     await this.transferModel
       .findByIdAndUpdate(transferId, {
-        $set: { status: TransferStatus.DONE },
+        $set: {
+          amountWithoutFees,
+          offchainTransferTx,
+          status: TransferStatus.ONCHAIN_TRANSFER_DONE,
+        },
       })
       .exec();
+
+    this.notifyOffchainProvider({
+      ...transfer,
+      offchainTransferTx,
+      amountWithoutFees,
+      status: TransferStatus.ONCHAIN_TRANSFER_DONE,
+    });
 
     return await this.transferModel.findById(transferId);
   }
@@ -198,7 +245,7 @@ export class TransferService implements OnApplicationBootstrap {
     this.logger.info('[CRON] Checking pending transfers');
 
     const pendingTransfers = await this.transferModel
-      .find({ status: TransferStatus.INITIALIZED })
+      .find({ status: TransferStatus.PENDING })
       .lean();
 
     for (const transfer of pendingTransfers) {

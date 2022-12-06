@@ -5,14 +5,17 @@ import { User, UserDocument } from 'src/schemas/user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
     return this.userModel.findOne({ email });
   }
 
   async createUser(signupInput): Promise<User | undefined> {
-    const user = new this.userModel(signupInput).save();
-    return user;
+    return new this.userModel(signupInput).save();
+  }
+
+  async getUser(userId): Promise<User | undefined> {
+    return this.userModel.findById(userId);
   }
 }

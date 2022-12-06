@@ -1,4 +1,4 @@
-import { SchemaTypes, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
@@ -21,17 +21,29 @@ export class Recipient {
 export class Transfer {
   _id: Types.ObjectId;
 
-  @Prop({ default: TransferStatus.INITIALIZED })
+  @Prop({ default: TransferStatus.PENDING })
   status: TransferStatus;
 
   @Prop({ required: false })
   amount: number;
+
+  @Prop({ required: false })
+  amountWithoutFees?: number;
 
   @Prop({ _id: false })
   recipient: Recipient;
 
   @Prop()
   userWalletAddress: string;
+
+  @Prop()
+  offchainProviderTrackingId?: string;
+
+  @Prop()
+  offchainTransferTx?: string;
+
+  // @Prop()
+  // tx?: string;
 
   @Prop()
   user: Types.ObjectId;

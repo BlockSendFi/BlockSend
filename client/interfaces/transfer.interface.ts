@@ -1,4 +1,4 @@
-import { TransferStatusEnum } from "../enums/transfer-status.enum";
+import { TransferStatus } from "../enums/transfer-status.enum";
 
 interface ITransfer {
   _id: string;
@@ -10,7 +10,7 @@ interface ITransfer {
   amount: number;
   createdAt: Date;
   updatedAt: Date;
-  status: TransferStatusEnum
+  status: TransferStatus
 }
 
 export default ITransfer
