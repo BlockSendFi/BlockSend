@@ -89,13 +89,13 @@ contract Transfer is Ownable{
 
         bool okGetEURe = transferFrom(transferId, userWallet, amount);
         if(!okGetEURe){
-            TransferStuck(transferId, amount, userWallet, "");
+            TransferStuck(transferId, userWallet, amount, "");
             return false;
         }
 
         (bool okApproveWrap, uint256 amountJEUR) = routage_jEURfromEURe(transferId, amount, amount);
         if(!okApproveWrap || amountJEUR==0){
-            TransferStuck(transferId, amount, userWallet, "");
+            TransferStuck(transferId, userWallet, amount, "");
             return false;
         }
 
@@ -104,13 +104,13 @@ contract Transfer is Ownable{
 
         (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
         if(!okApprouveJEUR || !okApprouveUSDC || collateralRedeemed==0 || feePaid==0){
-            TransferStuck(transferId, amount, userWallet, "");
+            TransferStuck(transferId, userWallet, amount, "");
             return false;
         }
 
         bool okTransferToHub2Wallet = transferToHUB2Wallet(transferId, collateralRedeemed);
         if(!okTransferToHub2Wallet){
-            TransferStuck(transferId, amount, userWallet, "");
+            TransferStuck(transferId, userWallet, amount, "");
             return false;
         }
 
@@ -167,7 +167,7 @@ contract Transfer is Ownable{
         emit TransferStatusChanged(transferId, TransferStatus.USDC_SENT, "");
     }
 
-    function TransferStuck(string calldata transferId, uint amount, address userWallet, string memory errorMsg) internal returns (bool ok){
+    function TransferStuck(string calldata transferId, address userWallet, uint amount, string memory errorMsg) internal returns (bool ok){
         transfers[transferId].status=TransferStatus.TRANSFER_STUCK;
 
         ok = moneriumEURemoney.transfer(userWallet, amount);
