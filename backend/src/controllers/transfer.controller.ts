@@ -31,8 +31,12 @@ export class TransferController {
 
   // TODO: Do not forget to remove this controller
   @Post('/:transferId/done')
-  async simulateTransferDone(@Param('transferId') transferId: string) {
-    await this.transferService.transferDone(transferId);
+  async setTransferCompleted(@Param('transferId') transferId: string) {
+    await this.transferService.setTransferOnChainCompleted(
+      transferId,
+      '0x000',
+      200,
+    );
     return {
       success: true,
     };
