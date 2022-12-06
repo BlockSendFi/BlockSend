@@ -13,9 +13,13 @@ import { UserService } from './services/user.service';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { LocalStrategy } from './auth/local.strategy';
+import { TransferController } from './controllers/transfer.controller';
+import { TransferService } from './services/transfer.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     PassportModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],
@@ -48,10 +52,11 @@ import { LocalStrategy } from './auth/local.strategy';
       inject: [ConfigService],
     }),
   ],
-  controllers: [ContactController, AuthController],
+  controllers: [ContactController, AuthController, TransferController],
   providers: [
     ContactService,
     UserService,
+    TransferService,
     AuthService,
     JwtStrategy,
     LocalStrategy,
