@@ -4,10 +4,11 @@ pragma solidity ^0.8.9;
 import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interfaces/IFixedRateWrapper.sol";
 import "./interfaces/ISynthereum.sol";
 
-contract Transfer is Ownable{
+contract BlockSendTransfer is Ownable{
     AggregatorV3Interface private priceFeed;
 
     IFixedRateWrapper private  jarvisWrapper;
@@ -23,7 +24,6 @@ contract Transfer is Ownable{
     address private JEUR_TOKEN_CONTRACT = 0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c;
     address private USDC_TOKEN_CONTRACT = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
     address private EUR_USD_AGGREGATOR = 0x73366Fe0AA0Ded304479862808e02506FE556a98;
-
     address private HUB2_WALLET = 0x64568cfc9122104a4B23ABf67830873BE66Fc3D8;
     address private BLOCKSEND_BACKEND = 0x913Cd67dA3b17be7f66E865158cDF9a5c4F2a850;
     address private BLOCKSEND_WALLET = 0x64568cfc9122104a4B23ABf67830873BE66Fc3D8;
@@ -34,8 +34,11 @@ contract Transfer is Ownable{
         uint amount_EURe;
         uint amount_jEUR;
         uint amount_USDC;
+        uint userAmount_USDC;
+        uint blocksendAmount_USDC;
         TransferStatus status;
     }
+
     enum TransferStatus {
         INITIALIZED,
         EURE_RECEIVED,
@@ -50,7 +53,7 @@ contract Transfer is Ownable{
 
     event TransferInitilized(string transferId, uint amount);
     event TransferStatusChanged(string transferId, TransferStatus currentStatus, string errorMsg);
-    event TransferFinalized(string transferId, string tx);
+    event TransferFinalized(string transferId, uint userAmount, uint blocksendAmount);
 
     modifier onlyBlockSendBakend() {
         require(allowed[msg.sender], "You're allowed to initiate a transfer");
@@ -74,18 +77,19 @@ contract Transfer is Ownable{
      * @notice 2- Wrap EURe to jEUR (Jarvis wrapper)
      * @notice 3- Get jEUR/USDC Rate (Aggregator Chainlink)
      * @notice 4- Redeem USDC from jEUR (Jarvis Redeem)
-     * @notice Secod Step: Get the 2% of fees
+     * @notice Secod Step: Calculate 1,9% of fees
      * @notice Third Step: Off-Ramp: Using HUB2
      * @notice if any error: Sent money to users wallet back
-     * @param transferId Input parameters for redeeming (see RedeemParams struct)
-     * @param amount Input parameters for redeeming (see RedeemParams struct)
+     * @param transferId Input parameters transferId
+     * @param amount Input parameters for for transfered amount
+     * @param userWallet Input parameters for user wallet
      * @return ok a boolean value indicating whether the operation succeeded.
      * 
      * Emits a {TransferStatusChanged} event with the current status of the transfer.
      */
     function initializeTransfer(string calldata transferId, address userWallet, uint256 amount) external onlyBlockSendBakend returns (bool ok) {
 
-        initilizeTransferData(transferId, amount);
+        initilizeTransferData(transferId, userWallet, amount);
 
         bool okGetEURe = transferFrom(transferId, userWallet, amount);
         if(!okGetEURe){
@@ -99,8 +103,8 @@ contract Transfer is Ownable{
             return false;
         }
 
-        uint price = getLatestPrice();        
-        uint collateralUSDC = (amountJEUR/10e8)*price; 
+        uint price = getLatestPrice();
+        uint collateralUSDC = SafeMath.mul(SafeMath.div(amountJEUR, 10e8), price);
 
         (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
         if(!okApprouveJEUR || !okApprouveUSDC || collateralRedeemed==0 || feePaid==0){
@@ -108,13 +112,16 @@ contract Transfer is Ownable{
             return false;
         }
 
-        bool okTransferToHub2Wallet = transferToHUB2Wallet(transferId, collateralRedeemed);
-        if(!okTransferToHub2Wallet){
+        
+        // (uint blocksendAmount, uint userAmount) = transferToHUB2Wallet(transferId, collateralRedeemed);
+        bool okTransferWallet = transferUSDC(transferId, collateralRedeemed);
+        // if(userAmount!=0 && blocksendAmount!=0){
+        if(!okTransferWallet){
             TransferStuck(transferId, userWallet, amount, "");
             return false;
         }
 
-        finalizeTransfer(transferId, "");
+        finalizeTransfer(transferId);
 
         return true;
     }
@@ -127,17 +134,17 @@ contract Transfer is Ownable{
     }
 
     // *********************** Manage Status changed ************************************
-    function initilizeTransferData(string calldata transferId, uint amount) internal{
-        transfers[transferId].sender=msg.sender;
+    function initilizeTransferData(string calldata transferId, address userWallet, uint amount) internal{
+        transfers[transferId].sender=userWallet;
         transfers[transferId].status=TransferStatus.INITIALIZED;
         
         emit TransferInitilized(transferId, amount);
     }
 
-    function finalizeTransfer(string calldata transferId, string memory transactionCode) internal{
+    function finalizeTransfer(string calldata transferId) internal{
         transfers[transferId].status=TransferStatus.FINALIZED;
         
-        emit TransferFinalized(transferId, transactionCode);
+        emit TransferFinalized(transferId, transfers[transferId].userAmount_USDC, transfers[transferId].blocksendAmount_USDC);
     }
 
     function amountReceived(string calldata transferId, uint amount) internal{
@@ -161,8 +168,10 @@ contract Transfer is Ownable{
         emit TransferStatusChanged(transferId, TransferStatus.USDC_RECEIVED, "");
     }
 
-    function collateralSent(string calldata transferId) internal{
+    function collateralSent(string calldata transferId, uint userAmount, uint blocksendAmount) internal{
         transfers[transferId].status=TransferStatus.USDC_SENT;
+        transfers[transferId].userAmount_USDC=userAmount;
+        transfers[transferId].blocksendAmount_USDC=blocksendAmount;
         
         emit TransferStatusChanged(transferId, TransferStatus.USDC_SENT, "");
     }
@@ -179,7 +188,7 @@ contract Transfer is Ownable{
 
     // *********************** GET EURe from user's wallet *****************************
     function transferFrom(string calldata transferId, address userWallet, uint256 amount) internal returns (bool ok){
-        ok = moneriumEURemoney.transferFrom(userWallet, BLOCKSEND_WALLET, amount);
+        ok = moneriumEURemoney.transferFrom(userWallet, address(this), amount);
 
         amountReceived(transferId, amount);
     }
@@ -221,18 +230,25 @@ contract Transfer is Ownable{
     // *********************************************************************************
     
 
-    // *********************** Transfer USDC to HUB2 Wallet ****************************
-    function transferToHUB2Wallet(string calldata transferId, uint256 amount) internal returns ( bool ok ){
-        ok = uSDCToken.transfer(HUB2_WALLET, amount);
+    // *********************** Transfer USDC to HUB2 Wallet & BlockSend Wallet *********
+    function transferUSDC(string calldata transferId, uint collateralRedeemed) internal returns ( bool ok ){
+        
+        (uint blocksendAmount, uint userAmount) = calculateFees(collateralRedeemed);
 
-        collateralSent(transferId);
+        bool okBlocksend = uSDCToken.transfer(BLOCKSEND_WALLET, blocksendAmount);
+        bool okHUB2 = uSDCToken.transfer(HUB2_WALLET, userAmount);
+
+        collateralSent(transferId, userAmount, blocksendAmount);
+        
+        return okHUB2 && okBlocksend;
     }
     // *********************************************************************************
     
 
-    // *********************** Take 2% fees ****************************
-    function takeFess(uint256 amount) internal returns ( bool ok ){
-        ok = uSDCToken.transfer(address(this), amount);
+    // *********************** Calculate 1,9% fees *************************************
+    function calculateFees(uint256 amount) internal pure returns ( uint blocksendAmount, uint userAmount ){
+        blocksendAmount = SafeMath.div(SafeMath.mul(amount, 19), 1000);
+        userAmount = SafeMath.sub(amount,  blocksendAmount);
     }
     // *********************************************************************************
 
@@ -240,30 +256,36 @@ contract Transfer is Ownable{
     // *********************** Update Contracts Addresses ******************************
     function setWrapperContract(address newAddress) external onlyOwner {
         WRAPPER_CONTRACT = newAddress;
+        jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
     }
 
     function setSyntheriumContract(address newAddress) external onlyOwner {
         SYNTHEREUM_CONTRACT = newAddress;
+        jarvisSynthereum = ISynthereum(SYNTHEREUM_CONTRACT);
     }
 
     function setEURETokenContract(address newAddress) external onlyOwner {
         EURE_TOKEN_CONTRACT = newAddress;
+        moneriumEURemoney = IERC20(EURE_TOKEN_CONTRACT);
     }
 
     function setJEURToken_Contract(address newAddress) external onlyOwner {
         JEUR_TOKEN_CONTRACT = newAddress;
+        jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
     }
 
     function setUSDCTokenContract(address newAddress) external onlyOwner {
         USDC_TOKEN_CONTRACT = newAddress;
-    }
-
-    function setHUB2Wallet(address newAddress) external onlyOwner {
-        HUB2_WALLET = newAddress;
+        uSDCToken = IERC20(USDC_TOKEN_CONTRACT);
     }
 
     function setEUR_USD_Aggregator(address newAddress) external onlyOwner {
         EUR_USD_AGGREGATOR = newAddress;
+        priceFeed = AggregatorV3Interface(EUR_USD_AGGREGATOR);
+    }
+
+    function setHUB2Wallet(address newAddress) external onlyOwner {
+        HUB2_WALLET = newAddress;
     }
 
     function setBlockSend_Wallet(address newAddress) external onlyOwner {
@@ -279,7 +301,7 @@ contract Transfer is Ownable{
     // *********************** Get the latest rate *************************************
     function getLatestPrice() public view returns (uint) {
         (, int price , , ,) = priceFeed.latestRoundData();
-        return uint(price/1000);
+        return SafeMath.div(uint(price), 1000);
     }
     // *********************************************************************************
 }
