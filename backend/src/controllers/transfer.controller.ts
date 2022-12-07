@@ -7,7 +7,7 @@ import { TransferService } from 'src/services/transfer.service';
 
 @Controller('transfers')
 export class TransferController {
-  constructor(private readonly transferService: TransferService) { }
+  constructor(private readonly transferService: TransferService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('/')
@@ -32,11 +32,7 @@ export class TransferController {
   // TODO: Do not forget to remove this controller
   @Post('/:transferId/done')
   async setTransferCompleted(@Param('transferId') transferId: string) {
-    await this.transferService.setTransferOnChainCompleted(
-      transferId,
-      '0x000',
-      200,
-    );
+    await this.transferService.setTransferOnChainCompleted(transferId, 200);
     return {
       success: true,
     };
