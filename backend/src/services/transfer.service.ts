@@ -1,6 +1,7 @@
 import {
   Inject,
   Injectable,
+  Logger,
   OnApplicationBootstrap,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,12 +12,15 @@ import { ContactService } from './contact.service';
 import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
-import { ethers } from 'ethers';
-import { Cron } from '@nestjs/schedule';
-import { Logger } from 'ethers/lib/utils';
+import { BigNumber, ethers } from 'ethers';
 import ERC20ABI from '../contracts/ERC20.json';
-import BlockSendABI from '../contracts/Transfer.json';
+import BlockSendTransferABI from '../contracts/BlockSendTransfer.json';
 import { UserService } from './user.service';
+
+interface IOptionsTx {
+  gasPrice: BigNumber;
+  gasLimit: BigNumber;
+}
 
 @Injectable()
 export class TransferService implements OnApplicationBootstrap {
@@ -32,7 +36,10 @@ export class TransferService implements OnApplicationBootstrap {
     @Inject('ContactService') private contactService: ContactService,
     @Inject('UserService') private userService: UserService,
   ) {
-    const networkUrl = `${process.env.ALCHEMY_NETWORK_ENDPOINT}${process.env.ALCHEMY_API_KEY}`;
+    const networkUrl =
+      process.env.NODE_ENV === 'development'
+        ? `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`
+        : `${process.env.ALCHEMY_NETWORK_ENDPOINT}${process.env.ALCHEMY_API_KEY}`;
     this.provider = new ethers.providers.JsonRpcProvider(networkUrl);
 
     this.EUReContract = new ethers.Contract(
@@ -47,16 +54,16 @@ export class TransferService implements OnApplicationBootstrap {
     );
 
     this.BlockSendContract = new ethers.Contract(
-      process.env.BLOCKSEND_ADDRESS,
-      BlockSendABI.abi,
+      process.env.BLOCKSEND_ROUTER_ADDRESS,
+      BlockSendTransferABI.abi,
       this.signer,
+
+      // { gasPrice: ethers.utils.parseUnits('100', 'gwei'), gasLimit: 1000000 },
     );
   }
 
   private async onTransferInitialized(transferId, amount) {
-    this.logger.info(
-      `Transfer ${transferId} with amount ${amount} initialized`,
-    );
+    this.logger.log(`Transfer ${transferId} with amount ${amount} initialized`);
 
     await this.transferModel
       .findByIdAndUpdate(transferId, {
@@ -68,13 +75,13 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private onTransferStatusChanged(transferId, status, error) {
-    this.logger.info(
+    this.logger.log(
       `Transfer ${transferId} changed status to ${status} (Error : ${error})`,
     );
   }
 
   private onTransferFinalized(transferId, amountWithoutFees) {
-    this.logger.info(
+    this.logger.log(
       `Transfer ${transferId} finalized (amountWithoutFees: ${amountWithoutFees})`,
     );
 
@@ -91,7 +98,7 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   onApplicationBootstrap() {
-    this.logger.info(`(TransferService) The module has been initialized.`);
+    this.logger.log(`(TransferService) The module has been initialized.`);
 
     this.listenEvents();
   }
@@ -122,31 +129,43 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private async startTransfer(transfer: Transfer) {
-    this.logger.info(`Starting transfer ${transfer._id} now !`);
+    this.logger.log(`Starting transfer ${transfer._id} now !`);
     await this.transferModel
       .findByIdAndUpdate(transfer._id, {
         $set: { status: TransferStatus.STARTING },
       })
       .exec();
+
     const amountDecimals = ethers.utils.parseUnits(
       transfer.amount.toString(),
-      18,
+      'gwei',
     );
     try {
+      const optionsTx: IOptionsTx = {
+        gasPrice: ethers.utils.parseUnits('40.0', 'gwei'),
+        gasLimit: ethers.utils.parseUnits('0.008', 'gwei'),
+      };
+
       const tx = await this.BlockSendContract.initializeTransfer(
-        transfer._id,
+        transfer._id.toString(),
         transfer.userWalletAddress,
         amountDecimals,
+        optionsTx,
       );
+
+      this.logger.log(tx);
 
       await this.transferModel
         .findByIdAndUpdate(transfer._id, {
-          $set: { offchainTransferTx: tx.address },
+          $set: { offchainTransferTx: tx.hash },
         })
         .exec();
-      console.log(`setting offchainTransferTx in transfer ${transfer._id}`);
+      this.logger.log(
+        `Setting offchainTransferTx (${tx.hash}) in transfer ${transfer._id}`,
+      );
     } catch (error) {
-      this.logger.info(`Transfer ${transfer._id} failed : « ${error.reason} »`);
+      console.error(error);
+      this.logger.log(`Transfer ${transfer._id} failed : « ${error.reason} »`);
       await this.transferModel
         .findByIdAndUpdate(transfer._id, {
           $set: { status: TransferStatus.FAILED },
@@ -169,7 +188,7 @@ export class TransferService implements OnApplicationBootstrap {
       },
     };
 
-    console.log('notify offchain provider with', offchainProviderParams);
+    this.logger.info('notify offchain provider with', offchainProviderParams);
 
     try {
       const response = await axios.post(
@@ -190,7 +209,7 @@ export class TransferService implements OnApplicationBootstrap {
         })
         .exec();
     } catch (error) {
-      this.logger.info(
+      this.logger.log(
         `Failed to notify offchain provider for transfer ${transfer._id}`,
       );
     }
@@ -221,12 +240,15 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private async checkBalanceAndStartTransfer(transfer: Transfer) {
+    this.logger.debug(
+      `Checking EURe balance for wallet ${transfer.userWalletAddress}`,
+    );
     const balance = await this.EUReContract.balanceOf(
       transfer.userWalletAddress,
     );
 
     const balanceInt = parseInt(ethers.utils.formatEther(balance));
-    this.logger.info(
+    this.logger.log(
       `[CRON] User wallet ${transfer.userWalletAddress} has a balance of ${balanceInt} EURe / ${transfer.amount} EURe`,
     );
 
@@ -235,9 +257,9 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  @Cron('* * * * *')
+  // @Cron('* * * * *') // TODO : do not forget to activate cron
   async checkPendingTransfers() {
-    this.logger.info('[CRON] Checking pending transfers');
+    this.logger.log('[CRON] Checking pending transfers');
 
     const pendingTransfers = await this.transferModel
       .find({ status: TransferStatus.PENDING })

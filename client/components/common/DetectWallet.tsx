@@ -22,16 +22,6 @@ const DetectWallet = () => {
           {`Vous êtes connecté avec l'adresse ${address}`}
         </div>
 
-        <div className="mt-2">
-          <span>
-            {`Cette adresse n'est pas enregistré sur BlockSend. Pour pouvoir faire un nouveau transfert, veuillez `}
-          </span>
-
-          <span className="font-semibold underline underline-offset-2 cursor-pointer">
-            {"l'enregistrer."}
-          </span>
-        </div>
-
         <div className="mt-2">{wrongNetwork && <div>
           <p>{`Vous êtes sur le mauvais réseau ! Veuillez sélectionner le réseau ${process.env.NEXT_PUBLIC_NETWORK_CHAIN_NAME}`}</p>
 
