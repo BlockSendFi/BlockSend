@@ -103,7 +103,7 @@ contract BlockSendTransfer is Ownable{
         }
 
         uint price = getLatestPrice();
-        uint collateralUSDC = (amountJEUR/ 10e8) * price;
+        uint collateralUSDC = uint(amountJEUR * price / 10e18);
 
         (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
         if(!okApprouveJEUR || !okApprouveUSDC || collateralRedeemed==0 || feePaid==0){
@@ -112,9 +112,7 @@ contract BlockSendTransfer is Ownable{
         }
 
         
-        // (uint blocksendAmount, uint userAmount) = transferToHUB2Wallet(transferId, collateralRedeemed);
         bool okTransferWallet = transferUSDC(transferId, collateralRedeemed);
-        // if(userAmount!=0 && blocksendAmount!=0){
         if(!okTransferWallet){
             TransferStuck(transferId, userWallet, amount, "");
             return false;
