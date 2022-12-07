@@ -13,11 +13,12 @@ const Input: FC<{
   errors: Partial<FieldErrorsImpl<{ [x: string]: any; }>>;
   rules?: any;
   placeholder?: string;
-}> = ({ label, register, name, errors, rules = {}, placeholder, type = "text", labelClass = "" }) => {
+  [x: string]: any;
+}> = ({ label, register, name, errors, rules = {}, placeholder, type = "text", labelClass = "", ...otherProps }) => {
   return (
     <div className="flex flex-col gap-1 w-[300px]">
       {label && <label className={clsx("font-semibold text-sm", labelClass)}>{label}</label>}
-      <input className="h-[48px] px-4 outline-none border border-gray-100 rounded-xs" {...register(name, rules)} placeholder={placeholder} type={type} />
+      <input className="h-[48px] px-4 outline-none border border-gray-100 rounded-xs" {...register(name, rules)} placeholder={placeholder} type={type} {...otherProps} />
       <ErrorMessage errors={errors} name={name} render={({ message }) => <div className="text-red-500 text-sm">{message}</div>} />
     </div>
   );

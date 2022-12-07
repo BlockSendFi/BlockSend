@@ -82,6 +82,7 @@ const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
                 label="Montant du transfert en €"
                 register={register}
                 name="amount"
+                step={0.01}
                 errors={errors}
                 rules={{
                   required: 'Ce champ est obligatoire',
