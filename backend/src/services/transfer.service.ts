@@ -32,7 +32,7 @@ export class TransferService implements OnApplicationBootstrap {
     @Inject('ContactService') private contactService: ContactService,
     @Inject('UserService') private userService: UserService,
   ) {
-    const networkUrl = `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`;
+    const networkUrl = `${process.env.ALCHEMY_NETWORK_ENDPOINT}${process.env.ALCHEMY_API_KEY}`;
     this.provider = new ethers.providers.JsonRpcProvider(networkUrl);
 
     this.EUReContract = new ethers.Contract(
