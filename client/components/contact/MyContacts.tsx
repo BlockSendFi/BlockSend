@@ -26,7 +26,7 @@ const MyContacts = () => {
       {
         isError ? (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          <div className="text-red-500 mt-2">{(error as any).response.data.message}</div>
+          <div className="text-red-500 mt-2">{(error as any).response?.data?.message || "Une erreur s'est produite"}</div>
         ) : (
           <>
             {

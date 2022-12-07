@@ -3,12 +3,9 @@ import React, { useContext, useEffect } from 'react';
 import InnerBlock from '../components/layouts/InnerBlock';
 import Layout from '../components/layouts/Layout';
 import { AuthContext } from '../contexts/auth.context';
-
 import dynamic from 'next/dynamic';
-import MyContacts from '../components/contact/MyContacts';
 
-const DetectWallet = dynamic(() => import('../components/common/DetectWallet'), { ssr: false })
-
+const InnerApp = dynamic(() => import('../components/layouts/InnerApp'), { ssr: false })
 
 const AppPage = () => {
   const router = useRouter()
@@ -21,11 +18,7 @@ const AppPage = () => {
   return (
     <Layout variant>
       <InnerBlock className="py-8">
-        <div className="flex gap-6 flex-col">
-          <DetectWallet />
-
-          <MyContacts />
-        </div>
+        <InnerApp />
       </InnerBlock>
     </Layout>
   );
