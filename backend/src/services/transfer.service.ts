@@ -73,20 +73,12 @@ export class TransferService implements OnApplicationBootstrap {
     );
   }
 
-  private onTransferFinalized(
-    transferId,
-    offchainTransferTx,
-    amountWithoutFees,
-  ) {
+  private onTransferFinalized(transferId, amountWithoutFees) {
     this.logger.info(
       `Transfer ${transferId} finalized (offchainTransferTx : ${offchainTransferTx})`,
     );
 
-    this.setTransferOnChainCompleted(
-      transferId,
-      offchainTransferTx,
-      amountWithoutFees,
-    );
+    this.setTransferOnChainCompleted(transferId, amountWithoutFees);
   }
 
   private listenEvents() {
@@ -141,11 +133,18 @@ export class TransferService implements OnApplicationBootstrap {
       18,
     );
     try {
-      await this.BlockSendContract.initializeTransfer(
+      const tx = await this.BlockSendContract.initializeTransfer(
         transfer._id,
         transfer.userWalletAddress,
         amountDecimals,
       );
+
+      await this.transferModel
+        .findByIdAndUpdate(transfer._id, {
+          $set: { offchainTransferTx: tx.address },
+        })
+        .exec();
+      console.log(`setting offchainTransferTx in transfer ${transfer._id}`);
     } catch (error) {
       this.logger.info(`Transfer ${transfer._id} failed : « ${error.reason} »`);
       await this.transferModel
@@ -169,6 +168,8 @@ export class TransferService implements OnApplicationBootstrap {
         country: 'FR',
       },
     };
+
+    console.log('notify offchain provider with', offchainProviderParams);
 
     try {
       const response = await axios.post(
@@ -195,11 +196,7 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  async setTransferOnChainCompleted(
-    transferId,
-    offchainTransferTx,
-    amountWithoutFees,
-  ) {
+  async setTransferOnChainCompleted(transferId, amountWithoutFees) {
     const transfer = await this.transferModel.findById(transferId);
     if (transfer.status === TransferStatus.OFFRAMP_COMPLETED) {
       return;
@@ -209,7 +206,6 @@ export class TransferService implements OnApplicationBootstrap {
       .findByIdAndUpdate(transferId, {
         $set: {
           amountWithoutFees,
-          offchainTransferTx,
           status: TransferStatus.ONCHAIN_TRANSFER_DONE,
         },
       })
@@ -217,7 +213,6 @@ export class TransferService implements OnApplicationBootstrap {
 
     this.notifyOffchainProvider({
       ...transfer,
-      offchainTransferTx,
       amountWithoutFees,
       status: TransferStatus.ONCHAIN_TRANSFER_DONE,
     });
