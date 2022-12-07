@@ -4,10 +4,11 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { User } from 'src/schemas/user.schema';
 import { InitTransferInput } from 'src/inputs/init-transfer.input';
 import { TransferService } from 'src/services/transfer.service';
+import { OffchainProviderEventInput } from 'src/inputs/offchain-provider-event-input.input';
 
 @Controller('transfers')
 export class TransferController {
-  constructor(private readonly transferService: TransferService) {}
+  constructor(private readonly transferService: TransferService) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('/')
@@ -29,10 +30,13 @@ export class TransferController {
     return transfer;
   }
 
-  // TODO: Do not forget to remove this controller
-  @Post('/:transferId/done')
-  async setTransferCompleted(@Param('transferId') transferId: string) {
-    await this.transferService.setTransferOnChainCompleted(transferId, 200);
+  @Post('/notify')
+  async offchainProviderTransferEvent(
+    @Body() offchainProviderEventInput: OffchainProviderEventInput,
+  ) {
+    await this.transferService.handleOffchainProviderTransferEvent(
+      offchainProviderEventInput,
+    );
     return {
       success: true,
     };

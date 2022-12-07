@@ -188,7 +188,9 @@ export class TransferService implements OnApplicationBootstrap {
       },
     };
 
-    this.logger.info('notify offchain provider with', offchainProviderParams);
+    this.logger.log(
+      `Notify offchain provider with ${JSON.stringify(offchainProviderParams)}`,
+    );
 
     try {
       const response = await axios.post(
@@ -204,7 +206,7 @@ export class TransferService implements OnApplicationBootstrap {
         .findOneAndUpdate(transfer._id, {
           $set: {
             status: TransferStatus.OFFRAMP_INIT,
-            offchainProviderTrackingId: response.data.trackingId,
+            offchainProviderTrackingId: response.data.id,
           },
         })
         .exec();
@@ -267,6 +269,54 @@ export class TransferService implements OnApplicationBootstrap {
 
     for (const transfer of pendingTransfers) {
       await this.checkBalanceAndStartTransfer(transfer);
+    }
+  }
+
+  async handleOffchainProviderTransferEvent(offchainProviderTransferEvent) {
+    /*
+      Possible events 
+      WRAPPER_RECEIVED = 'wrapper.received',
+      WRAPPER_CHECKING = 'wrapper.checking',
+      WRAPPER_CHECK_FAILED = 'wrapper.check.failed',
+      WRAPPER_CHECK_SUCCESS = 'wrapper.check.success',
+      API_CREATED = 'api.created',
+      API_PENDING = 'api.pending',
+      API_SUCCESS = 'api.success',
+      API_FAILED = 'api.failed',
+    */
+
+    const transfer = await this.transferModel
+      .findOne({
+        offchainProviderTrackingId: offchainProviderTransferEvent.id,
+      })
+      .lean();
+
+    if (!transfer) {
+      this.logger.log(
+        `No transfer found for offchain provider transfer id ${offchainProviderTransferEvent.id}`,
+      );
+      return;
+    }
+
+    if (offchainProviderTransferEvent.type === 'api.success') {
+      this.logger.log(`Transfer ${transfer._id} completed !`);
+      await this.transferModel
+        .findByIdAndUpdate(transfer._id, {
+          $set: { status: TransferStatus.OFFRAMP_COMPLETED },
+        })
+        .exec();
+    } else if (
+      offchainProviderTransferEvent.type === 'api.failed' ||
+      offchainProviderTransferEvent.type === 'wrapper.check.failed'
+    ) {
+      this.logger.log(
+        `Transfer ${transfer._id} failed ! Reason : ${offchainProviderTransferEvent.type}`,
+      );
+      await this.transferModel
+        .findByIdAndUpdate(transfer._id, {
+          $set: { status: TransferStatus.FAILED },
+        })
+        .exec();
     }
   }
 }
