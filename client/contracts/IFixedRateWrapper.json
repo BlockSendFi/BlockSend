@@ -40,15 +40,15 @@
     "absolutePath": "project:/contracts/interfaces/IFixedRateWrapper.sol",
     "exportedSymbols": {
       "IFixedRateWrapper": [
-        997
+        998
       ]
     },
-    "id": 998,
+    "id": 999,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 986,
+        "id": 987,
         "literals": [
           "solidity",
           "^",
@@ -65,9 +65,9 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 997,
+        "id": 998,
         "linearizedBaseContracts": [
-          997
+          998
         ],
         "name": "IFixedRateWrapper",
         "nameLocation": "70:17:2",
@@ -75,13 +75,13 @@
         "nodes": [
           {
             "documentation": {
-              "id": 987,
+              "id": 988,
               "nodeType": "StructuredDocumentation",
               "src": "95:456:2",
               "text": " @notice This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokens\n @notice The conversion is based on a fixed rate\n @param _collateral The amount of peg collateral tokens to be deposited\n @param _recipient The address of the recipient to receive the newly minted fixed rate synthetic tokens\n @return amountTokens The amount of newly minted fixed rate synthetic tokens"
             },
             "functionSelector": "13bac820",
-            "id": 996,
+            "id": 997,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -89,17 +89,17 @@
             "nameLocation": "565:4:2",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 992,
+              "id": 993,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 989,
+                  "id": 990,
                   "mutability": "mutable",
                   "name": "_collateral",
                   "nameLocation": "578:11:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 996,
+                  "scope": 997,
                   "src": "570:19:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -108,7 +108,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 988,
+                    "id": 989,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "570:7:2",
@@ -121,12 +121,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 991,
+                  "id": 992,
                   "mutability": "mutable",
                   "name": "_recipient",
                   "nameLocation": "599:10:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 996,
+                  "scope": 997,
                   "src": "591:18:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -135,7 +135,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 990,
+                    "id": 991,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "591:7:2",
@@ -151,17 +151,17 @@
               "src": "569:41:2"
             },
             "returnParameters": {
-              "id": 995,
+              "id": 996,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 994,
+                  "id": 995,
                   "mutability": "mutable",
                   "name": "amountTokens",
                   "nameLocation": "637:12:2",
                   "nodeType": "VariableDeclaration",
-                  "scope": 996,
+                  "scope": 997,
                   "src": "629:20:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -170,7 +170,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 993,
+                    "id": 994,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "629:7:2",
@@ -184,14 +184,14 @@
               ],
               "src": "628:22:2"
             },
-            "scope": 997,
+            "scope": 998,
             "src": "556:95:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 998,
+        "scope": 999,
         "src": "60:594:2",
         "usedErrors": []
       }
@@ -204,7 +204,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-12-07T10:56:39.127Z",
+  "updatedAt": "2022-12-07T16:18:34.870Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
