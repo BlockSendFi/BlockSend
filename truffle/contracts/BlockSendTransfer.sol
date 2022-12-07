@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interfaces/IFixedRateWrapper.sol";
 import "./interfaces/ISynthereum.sol";
 
@@ -104,7 +103,7 @@ contract BlockSendTransfer is Ownable{
         }
 
         uint price = getLatestPrice();
-        uint collateralUSDC = SafeMath.mul(SafeMath.div(amountJEUR, 10e8), price);
+        uint collateralUSDC = (amountJEUR/ 10e8) * price;
 
         (bool okApprouveJEUR, bool okApprouveUSDC, uint256 collateralRedeemed, uint256 feePaid) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
         if(!okApprouveJEUR || !okApprouveUSDC || collateralRedeemed==0 || feePaid==0){
@@ -247,8 +246,8 @@ contract BlockSendTransfer is Ownable{
 
     // *********************** Calculate 1,9% fees *************************************
     function calculateFees(uint256 amount) internal pure returns ( uint blocksendAmount, uint userAmount ){
-        blocksendAmount = SafeMath.div(SafeMath.mul(amount, 19), 1000);
-        userAmount = SafeMath.sub(amount,  blocksendAmount);
+        blocksendAmount = (amount * 19) / 1000;
+        userAmount = amount - blocksendAmount;
     }
     // *********************************************************************************
 
@@ -301,7 +300,7 @@ contract BlockSendTransfer is Ownable{
     // *********************** Get the latest rate *************************************
     function getLatestPrice() public view returns (uint) {
         (, int price , , ,) = priceFeed.latestRoundData();
-        return SafeMath.div(uint(price), 1000);
+        return uint(price/1000);
     }
     // *********************************************************************************
 }
