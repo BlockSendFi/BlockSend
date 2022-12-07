@@ -75,7 +75,7 @@ export class TransferService implements OnApplicationBootstrap {
 
   private onTransferFinalized(transferId, amountWithoutFees) {
     this.logger.info(
-      `Transfer ${transferId} finalized (offchainTransferTx : ${offchainTransferTx})`,
+      `Transfer ${transferId} finalized (amountWithoutFees: ${amountWithoutFees})`,
     );
 
     this.setTransferOnChainCompleted(transferId, amountWithoutFees);
