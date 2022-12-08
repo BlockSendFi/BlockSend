@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
 import ITransfer from '../../interfaces/transfer.interface';
-import Button from '../common/Button';
 import dayjs from 'dayjs'
 import { FaChevronRight } from 'react-icons/fa';
 
