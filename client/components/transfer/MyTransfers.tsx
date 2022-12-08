@@ -13,9 +13,9 @@ const MyTransfers = () => {
   const transfers = data?.data || []
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 flex-grow">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{"Historique des transferts"}</h2>
+        <h2 className="text-2xl font-bold">{"Mes transferts"}</h2>
         <Button title="Nouveau transfert" />
       </div>
 
