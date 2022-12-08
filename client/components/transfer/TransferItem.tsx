@@ -20,7 +20,7 @@ const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
             <div className="font-semibold">{`${transfer.recipient.firstName} ${transfer.recipient.lastName} (${transfer.recipient.phoneNumber})`}</div>
             <div>
               <span>
-                {`${transfer.amount || 0} €`}
+                {`${transfer.amount.toFixed(2) || 0} €`}
               </span>
 
               <span>{" - "}</span>

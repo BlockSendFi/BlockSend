@@ -12,7 +12,7 @@ const InnerApp = () => {
 
   return (
     <div>
-      <div className="flex gap-6 flex-col">
+      <div className="flex gap-8 flex-col">
         <DetectWallet />
         {
           isConnected && !wrongNetwork && (
