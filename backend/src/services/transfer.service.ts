@@ -36,6 +36,7 @@ export class TransferService implements OnApplicationBootstrap {
     @Inject('ContactService') private contactService: ContactService,
     @Inject('UserService') private userService: UserService,
   ) {
+    console.log('>>>', process.env.OFFCHAIN_PROVIDER_SECRET);
     const networkUrl =
       process.env.NODE_ENV === 'development'
         ? `${process.env.INFURA_NETWORK_ENDPOINT}${process.env.INFURA_API_KEY}`
@@ -177,7 +178,7 @@ export class TransferService implements OnApplicationBootstrap {
   private async notifyOffchainProvider(transfer) {
     const user = await this.userService.getUser(transfer.user);
     const offchainProviderParams = {
-      mode: 'live',
+      mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
       amount: transfer.amountWithoutFees,
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,
