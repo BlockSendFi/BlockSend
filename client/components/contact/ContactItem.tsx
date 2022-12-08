@@ -82,6 +82,7 @@ const ContactItem: FC<{ contact: IContact }> = ({ contact }) => {
                 label="Montant du transfert en €"
                 register={register}
                 name="amount"
+                min={0.5}
                 step={0.01}
                 errors={errors}
                 rules={{
