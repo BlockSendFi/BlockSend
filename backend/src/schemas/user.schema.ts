@@ -1,7 +1,7 @@
 import { SchemaTypes, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { KycStatus } from 'src/enums/kyc-status.enum copy';
+import { KycStatus } from 'src/enums/kyc-status.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
