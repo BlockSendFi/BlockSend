@@ -15,22 +15,19 @@ const MENU_ITEMS = [
   },
   {
     title: 'Tarifs',
-    url: '/tarifs'
-  },
-  {
+    url: '/'
+  }, {
     title: 'Entreprise',
-    url: '/entreprise'
-  },
-
+    url: '/'
+  }
 ]
 
 const Navbar: FC<{ variant?: boolean }> = ({ variant = false }) => {
   const router = useRouter()
   const { accessToken } = useContext(AuthContext)
 
-  const onClick = () => {
-    router.push('/')
-  }
+  const onClick = () => router.push('/')
+
 
   const Logo = accessToken ? LogoTextBlue : LogoText
 

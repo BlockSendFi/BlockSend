@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import ITransfer from '../../interfaces/transfer.interface';
 import Button from '../common/Button';
 import dayjs from 'dayjs'
+import { FaChevronRight } from 'react-icons/fa';
 
 const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
   const [open, setOpen] = useState(false)
@@ -10,8 +11,8 @@ const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
 
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center rounded-2xl border border-gray-200 p-2 cursor-pointer" onClick={() => setOpen(!open)}>
+    <div className="flex flex-col gap-2 px-4 py-3 border border-gray-200 p-2 cursor-pointer rounded-2xl" onClick={showDetails}>
+      <div className="flex justify-between items-center " onClick={() => setOpen(!open)}>
         <div className="flex gap-2" >
           <div className="rounded-full h-12 w-12 text-2xl font-bold text-white bg-blue-main flex items-center justify-center">
             {`${transfer.recipient.firstName[0]}${transfer.recipient.lastName[0]}`}
@@ -20,7 +21,7 @@ const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
             <div className="font-semibold">{`${transfer.recipient.firstName} ${transfer.recipient.lastName} (${transfer.recipient.phoneNumber})`}</div>
             <div>
               <span>
-                {`${transfer.amount || 0} €`}
+                {`${transfer.amount.toFixed(2) || 0} €`}
               </span>
 
               <span>{" - "}</span>
@@ -30,7 +31,7 @@ const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
           </div>
         </div>
 
-        <Button title="Détails" onClick={showDetails} color="transparent" textColor="black" />
+        <FaChevronRight />
       </div>
 
     </div>

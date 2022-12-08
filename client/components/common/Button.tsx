@@ -14,7 +14,7 @@ const Button: FC<{
 
   const buttonProps = {
     disabled: loading,
-    className: clsx(`h-[48px] text-${textColor} bg-${color} px-10 items-center flex gap-2 font-bold`, { "opacity-60": loading }, className),
+    className: clsx(`h-[48px] text-${textColor} bg-${color} px-8 items-center flex gap-2 font-bold`, { "opacity-60": loading }, className),
     type,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;

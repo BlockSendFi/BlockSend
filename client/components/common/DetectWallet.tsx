@@ -18,19 +18,28 @@ const DetectWallet = () => {
   return (
     <div>
       {isConnected ? (<div className="p-4 bg-blue-main text-white rounded-2xl shadow">
-        <div>
-          {`Vous êtes connecté avec l'adresse ${address}`}
+        <div className="text-center">
+          {`Vous êtes connecté avec l'adresse `}
+
+          <span className="font-semibold underline underline-offset-2">
+            {`${address}`}
+          </span>
         </div>
 
-        <div className="mt-2">{wrongNetwork && <div>
-          <p>{`Vous êtes sur le mauvais réseau ! Veuillez sélectionner le réseau ${process.env.NEXT_PUBLIC_NETWORK_CHAIN_NAME}`}</p>
+        {
+          wrongNetwork && (
+            <div className="mt-2">
+              <div>
+                <p>{`Vous êtes sur le mauvais réseau ! Veuillez sélectionner le réseau ${process.env.NEXT_PUBLIC_NETWORK_CHAIN_NAME}`}</p>
 
-          <Button
-            title="Changer de réseau"
-            onClick={() => switchNetwork?.(chainId)}
-          />
-        </div>}
-        </div>
+                <Button
+                  title="Changer de réseau"
+                  onClick={() => switchNetwork?.(chainId)}
+                />
+              </div>
+            </div>
+          )
+        }
       </div>) : (
         <Button onClick={() => connect()} title="Connecter mon wallet" />
       )}

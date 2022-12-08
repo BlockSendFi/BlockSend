@@ -89,12 +89,18 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private listenEvents() {
-    this.BlockSendContract.on('TransferInitilized', this.onTransferInitialized);
+    this.BlockSendContract.on(
+      'TransferInitilized',
+      this.onTransferInitialized.bind(this),
+    );
     this.BlockSendContract.on(
       'TransferStatusChanged',
-      this.onTransferStatusChanged,
+      this.onTransferStatusChanged.bind(this),
     );
-    this.BlockSendContract.on('TransferFinalized', this.onTransferFinalized);
+    this.BlockSendContract.on(
+      'TransferFinalized',
+      this.onTransferFinalized.bind(this),
+    );
   }
 
   onApplicationBootstrap() {
@@ -138,7 +144,7 @@ export class TransferService implements OnApplicationBootstrap {
 
     const amountDecimals = ethers.utils.parseUnits(
       transfer.amount.toString(),
-      'gwei',
+      18,
     );
     try {
       const optionsTx: IOptionsTx = {
@@ -149,7 +155,8 @@ export class TransferService implements OnApplicationBootstrap {
       const tx = await this.BlockSendContract.initializeTransfer(
         transfer._id.toString(),
         transfer.userWalletAddress,
-        amountDecimals,
+        // '500000000000000000',
+        amountDecimals, // '500000000000000000',
         optionsTx,
       );
 
@@ -161,7 +168,7 @@ export class TransferService implements OnApplicationBootstrap {
         })
         .exec();
       this.logger.log(
-        `Setting offchainTransferTx (${tx.hash}) in transfer ${transfer._id}`,
+        `Setting offchainTransferTx in transfer ${transfer._id} (${process.env.BLOCKCHAIN_EXPLORER}${tx.hash})`,
       );
     } catch (error) {
       console.error(error);
@@ -175,9 +182,17 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private async notifyOffchainProvider(transfer) {
+    console.log(
+      '🚀 ~ file: transfer.service.ts:190 ~ TransferService ~ notifyOffchainProvider ~ transfer',
+      transfer,
+    );
     const user = await this.userService.getUser(transfer.user);
+    console.log(
+      '🚀 ~ file: transfer.service.ts:185 ~ TransferService ~ notifyOffchainProvider ~ user',
+      user,
+    );
     const offchainProviderParams = {
-      mode: 'live',
+      mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
       amount: transfer.amountWithoutFees,
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,
@@ -219,6 +234,10 @@ export class TransferService implements OnApplicationBootstrap {
 
   async setTransferOnChainCompleted(transferId, amountWithoutFees) {
     const transfer = await this.transferModel.findById(transferId);
+    console.log(
+      '🚀 ~ file: transfer.service.ts:242 ~ TransferService ~ setTransferOnChainCompleted ~ transfer',
+      transfer,
+    );
     if (transfer.status === TransferStatus.OFFRAMP_COMPLETED) {
       return;
     }
