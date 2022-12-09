@@ -118,6 +118,8 @@ contract BlockSendRouter is Ownable {
 
         // TODO: check the minimal amount here
         // TODO: Remove useless events
+        // TODO: Add a function to expose rate EUR/USDC to the frontend
+        // TODO: Add a function to expose rate USDC/XOF to the frontend
 
         transferRewardsBalance[userWallet] += amount / 2;
 
