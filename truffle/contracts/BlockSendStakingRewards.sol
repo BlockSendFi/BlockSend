@@ -1,0 +1,134 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+
+contract StakingRewards is Ownable {
+
+    address private USDC_TOKEN_CONTRACT = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    
+    IERC20 public immutable bKSDToken;
+    IERC20 public immutable uSDCToken;
+
+
+    // User address => rewardPerTokenStored
+    mapping(address => uint) public userRewardPerTokenPaid;
+    // User address => rewards to be claimed
+    mapping(address => uint) public rewards;
+    // User address => staked amount
+    mapping(address => uint) public balanceOf;
+
+    // Duration of rewards to be paid out (in seconds)
+    uint public duration;
+    // Total staked
+    uint public totalStaked;
+    // Sum of (reward rate * dt * 1e18 / total supply)
+    uint public rewardPerTokenDetained;
+    // Minimum of last updated time and reward finish time
+    uint public lastRewarUpdatedAt;
+    // Timestamp of when the rewards finish
+    uint public expiresAt;
+    // Reward to be paid out per second
+    uint public rewardRate;
+
+    constructor(address _stakingToken) {
+        bKSDToken = IERC20(_stakingToken);
+        uSDCToken = IERC20(USDC_TOKEN_CONTRACT);
+    }
+
+    modifier updateReward(address _account) {
+        rewardPerTokenDetained = rewardPerToken();
+        lastRewarUpdatedAt = lastTimeRewardApplicable();
+
+        if (_account != address(0)) {
+            rewards[_account] = earned(_account);
+            userRewardPerTokenPaid[_account] = rewardPerTokenDetained;
+        }
+
+        _;
+    }
+
+    function claimTokens(uint _amount) external updateReward(msg.sender) {
+        //mint Tokens
+        // bKSDToken.mint(msg.sender, _amount);
+        // bKSDToken.transfer(msg.sender, _amount);
+
+    }
+
+    function claimAndStackTokens() external {
+    }
+
+    function stake(uint _amount) external updateReward(msg.sender) {
+        require(_amount > 0, "amount not valid!");
+        bKSDToken.transferFrom(msg.sender, address(this), _amount);
+        balanceOf[msg.sender] += _amount;
+        totalStaked += _amount;
+    }
+    
+    function unStake(uint _amount) external updateReward(msg.sender) {
+        require(_amount > 0, "amount not valid!");
+        require( _amount < balanceOf[msg.sender],"your staked tokens less than the input _amount");
+
+        bKSDToken.transfer(msg.sender, _amount);
+        balanceOf[msg.sender] -= _amount;
+        totalStaked -= _amount;
+    }
+
+    function withdrawRewards() external updateReward(msg.sender) {
+        uint reward = rewards[msg.sender];
+        require(reward > 0,"no rewards yearned yet");
+        rewards[msg.sender] = 0;
+        uSDCToken.transfer(msg.sender, reward);
+    }
+
+    function lastTimeRewardApplicable() public view returns (uint) {
+        return _min(expiresAt, block.timestamp);
+    }
+
+    function rewardPerToken() public view returns (uint) {
+        if (totalStaked == 0) {
+            return rewardPerTokenDetained;
+        }
+
+        return
+            rewardPerTokenDetained +
+            (rewardRate * (lastTimeRewardApplicable() - lastRewarUpdatedAt) * 1e18) /
+            totalStaked;
+    }
+
+    function earned(address _account) public view returns (uint) {
+        return
+            ((balanceOf[_account] *
+                (rewardPerToken() - userRewardPerTokenPaid[_account])) / 1e18) +
+            rewards[_account];
+    }
+
+    function setRewardsDuration(uint _duration) external onlyOwner {
+        require(expiresAt < block.timestamp, "reward duration not finished");
+        duration = _duration;
+    }
+
+    function notifyRewardAmount(uint _amount) external onlyOwner updateReward(address(0)) {
+        if (block.timestamp >= expiresAt) {
+            rewardRate = _amount / duration;
+        } else {
+            uint remainingRewards = (expiresAt - block.timestamp) * rewardRate;
+            rewardRate = (_amount + remainingRewards) / duration;
+        }
+
+        require(rewardRate > 0, "reward rate = 0");
+        require(
+            rewardRate * duration <= uSDCToken.balanceOf(address(this)),
+            "reward amount > balance"
+        );
+
+        expiresAt = block.timestamp + duration;
+        lastRewarUpdatedAt = block.timestamp;
+    }
+
+    function _min(uint _x, uint _y) private pure returns(uint){
+        return _x <= _y ? _x : _y ;
+    }
+    
+}
