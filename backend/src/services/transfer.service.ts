@@ -182,7 +182,7 @@ export class TransferService implements OnApplicationBootstrap {
     );
     const offchainProviderParams = {
       mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
-      amount: transfer.amountWithoutFees,
+      amount: transfer.amountWithoutFees.toNumber(),
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,
       origin: {
@@ -215,6 +215,10 @@ export class TransferService implements OnApplicationBootstrap {
         })
         .exec();
     } catch (error) {
+      console.log(
+        '🚀 ~ file: transfer.service.ts:218 ~ TransferService ~ notifyOffchainProvider ~ error',
+        error,
+      );
       this.logger.log(
         `Failed to notify offchain provider for transfer ${transfer._id}`,
       );
@@ -223,10 +227,6 @@ export class TransferService implements OnApplicationBootstrap {
 
   async setTransferOnChainCompleted(transferId, amountWithoutFees) {
     const transfer = await this.transferModel.findById(transferId).lean();
-    console.log(
-      '🚀 ~ file: transfer.service.ts:242 ~ TransferService ~ setTransferOnChainCompleted ~ transfer',
-      transfer,
-    );
     if (transfer.status === TransferStatus.OFFRAMP_COMPLETED) {
       return;
     }
@@ -234,7 +234,7 @@ export class TransferService implements OnApplicationBootstrap {
     await this.transferModel
       .findByIdAndUpdate(transferId, {
         $set: {
-          amountWithoutFees,
+          amountWithoutFees: amountWithoutFees.toNumber(),
           status: TransferStatus.ONCHAIN_TRANSFER_DONE,
         },
       })
@@ -242,7 +242,7 @@ export class TransferService implements OnApplicationBootstrap {
 
     this.notifyOffchainProvider({
       ...transfer,
-      amountWithoutFees,
+      amountWithoutFees: amountWithoutFees.toNumber(),
       status: TransferStatus.ONCHAIN_TRANSFER_DONE,
     });
 
