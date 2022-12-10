@@ -3,6 +3,7 @@ import Hero from './Hero';
 import { Inter } from '@next/font/google'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import clsx from 'clsx';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -12,12 +13,12 @@ const inter = Inter({
 
 const Layout: FC<{ children: JSX.Element, heroContent?: JSX.Element, variant?: boolean }> = ({ children, heroContent, variant = false }) => {
   return (
-    <div className={inter.className}>
+    <div className={clsx(inter.className, "h-screen flex flex-col")}>
       <Hero variant={variant}>
         {heroContent}
       </Hero>
 
-      <div>
+      <div className="bg-gray-100 flex flex-grow">
         {
           children
         }

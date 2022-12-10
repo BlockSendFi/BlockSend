@@ -25,16 +25,21 @@ const LoginForm: FC = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 justify-end">
       <div className="flex flex-col gap-4">
-        <Input labelClass="text-white" label="Email" register={register} name="email" errors={errors} rules={{
-          required: 'Ce champ est obligatoire', pattern: {
-            value: validationRegex.EMAIL_REGEX,
-            message: `Le format de l'email est invalide`
-          }
-        }} placeholder="Votre email" />
+        <Input
+          labelClass="text-white" label="Email" register={register} name="email" errors={errors} rules={{
+            required: 'Ce champ est obligatoire', pattern: {
+              value: validationRegex.EMAIL_REGEX,
+              message: `Le format de l'email est invalide`
+            }
+          }} placeholder="Votre email" />
         <Input
           labelClass="text-white"
           type="password"
-          label="Mot de passe" register={register} name="password" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre mot de passe" />
+          label="Mot de passe"
+          register={register}
+          name="password"
+          errors={errors}
+          rules={{ required: 'Ce champ est obligatoire' }} placeholder="Votre mot de passe" />
       </div>
 
       <Link href="/signup" className="text-white underline text-right underline-offset-2">
@@ -46,7 +51,7 @@ const LoginForm: FC = () => {
       }
 
       <div className="flex justify-end">
-        <Button title="Se connecter" className="items-self-end" type="submit" loading={isLoading} />
+        <Button className="items-self-end" type="submit" loading={isLoading} title={"Se connecter"} />
       </div>
     </form>
   );

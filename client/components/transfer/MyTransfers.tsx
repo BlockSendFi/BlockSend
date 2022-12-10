@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { FaPlusCircle } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import getMyTransfersQuery from '../../api/get-my-transfers-query.api';
 import { AuthContext } from '../../contexts/auth.context';
@@ -23,7 +24,14 @@ const MyTransfers = () => {
         <h2 className="text-2xl font-bold">{"Mes transferts"}</h2>
 
 
-        <Button title="Nouveau transfert" onClick={handleNewTransfer} />
+        <Button onClick={handleNewTransfer}>
+          <>
+            <FaPlusCircle />
+            <span>
+              {"Nouveau transfert"}
+            </span>
+          </>
+        </Button>
       </div>
 
       {
@@ -41,7 +49,7 @@ const MyTransfers = () => {
                     transfers.length ? (
                       <div className="flex flex-col gap-2">
                         {
-                          transfers.map((transfer: ITransfer, index: number) => (
+                          transfers.slice(0, 3).map((transfer: ITransfer, index: number) => (
                             <TransferItem key={index} transfer={transfer} />
                           ))
                         }

@@ -4,19 +4,23 @@ import {
   QueryClient,
   QueryClientProvider,
 } from 'react-query'
-import { WagmiConfig, createClient } from 'wagmi'
-import { getDefaultProvider } from 'ethers'
+import { WagmiConfig, createClient, chain, configureChains } from 'wagmi'
 import '../styles/globals.css'
 import Head from 'next/head';
 import AuthContextProvider from '../contexts/auth.context';
 import LayoutContextProvider from '../contexts/layout.context';
 
+import { publicProvider } from 'wagmi/providers/public'
+
 const queryClient = new QueryClient()
+const { provider } = configureChains([chain.polygon], [publicProvider()])
 
 const client = createClient({
   autoConnect: true,
-  provider: getDefaultProvider(),
+  provider,
+  // provider: getDefaultProvider(),
 })
+
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return <>

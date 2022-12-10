@@ -20,7 +20,6 @@ const TransferAmount: FC<{ onValid: (amount: number) => void }> = ({ onValid }) 
       <form onSubmit={handleSubmit(onSubmit)} className="justify-center flex flex-col">
         <div className="flex gap-2 items-end">
           <Input
-
             type="number"
             register={register}
             name="amount"

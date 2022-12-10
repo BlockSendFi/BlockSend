@@ -35,7 +35,7 @@ const AddContactModal: FC = () => {
       <Dialog.Title className="text-center text-xl uppercase font-bold">{"Ajouter un contact"}</Dialog.Title>
 
       <form onSubmit={handleOnSubmit} className="mt-6 justify-center flex flex-col">
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-4 w-full items-center">
           <Input label="Nom" register={register} name="lastName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Nom" />
           <Input label="Prénom" register={register} name="firstName" errors={errors} rules={{ required: 'Ce champ est obligatoire' }} placeholder="Prénom" />
           <Input label="N° de téléphone" register={register} name="phoneNumber" errors={errors}

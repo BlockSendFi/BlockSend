@@ -3,11 +3,10 @@ import { useBalance } from 'wagmi';
 import Loader from '../common/Loader';
 
 const BKSDBalance: FC<{ address: `0x${string}` }> = ({ address }) => {
-  return null
   const { data, isError, isLoading } = useBalance({
     address,
-    token: process.env.NEXT_PUBLIC_MONERIUM_EURE as `0x${string}`,
-    // address: process.env.NEXT_PUBLIC_BKSD_TOKEN as `0x${string}`,
+    chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
+    token: process.env.NEXT_PUBLIC_BKSD_TOKEN as `0x${string}`,
   })
 
   if (isLoading) return <Loader />
@@ -21,7 +20,6 @@ const BKSDBalance: FC<{ address: `0x${string}` }> = ({ address }) => {
       </div>
 
       <div className="font-bold text-sm">
-        {/* {"BKSD"} */}
         {data?.symbol}
       </div>
     </div>
