@@ -17,7 +17,7 @@ const DetectWallet = () => {
 
   return (
     <div>
-      {isConnected ? (<div className="p-4 bg-blue-main text-white rounded-2xl shadow">
+      {isConnected ? (<div className="py-6 px-4 bg-blue-main text-white rounded-2xl shadow">
         <div className="text-center">
           {`Vous êtes connecté avec l'adresse `}
 
@@ -30,12 +30,14 @@ const DetectWallet = () => {
           wrongNetwork && (
             <div className="mt-2">
               <div>
-                <p>{`Vous êtes sur le mauvais réseau ! Veuillez sélectionner le réseau ${process.env.NEXT_PUBLIC_NETWORK_CHAIN_NAME}`}</p>
+                <p className="text-center">{`Vous êtes sur le mauvais réseau ! Veuillez sélectionner le réseau ${process.env.NEXT_PUBLIC_NETWORK_CHAIN_NAME}`}</p>
 
-                <Button
-                  title="Changer de réseau"
-                  onClick={() => switchNetwork?.(chainId)}
-                />
+                <div className="flex justify-center mt-2">
+                  <Button
+                    title="Changer de réseau"
+                    onClick={() => switchNetwork?.(chainId)}
+                  />
+                </div>
               </div>
             </div>
           )

@@ -1,7 +1,7 @@
 {
-  "name": "truffle",
+  "name": "blocksend-truffle",
   "version": "1.0.0",
-  "description": "Truffle project with SimpleStorage contract",
+  "description": "Truffle project with BlockSend's contracts",
   "main": "truffle-config.js",
   "dependencies": {
     "@chainlink/contracts": "^0.5.1",

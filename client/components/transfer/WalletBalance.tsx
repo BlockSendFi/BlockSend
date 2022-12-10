@@ -1,7 +1,16 @@
 import React from 'react';
+import { useBalance } from 'wagmi';
 import Button from '../common/Button';
+import Loader from '../common/Loader';
 
 const WalletBalance = () => {
+  const { data, isError, isLoading } = useBalance({
+    address: process.env.NEXT_PUBLIC_BKSD_TOKEN as `0x${string}`,
+  })
+
+  if (isLoading) return <Loader />
+  if (isError) return <div>{"Error fetching balance"}</div>
+
   return (
     <div className="px-4 py-6 border rounded-2xl  border-gray-200 w-[260px] self-start">
       <h2 className="text-xl font-bold text-center">{"Votre wallet"}</h2>
@@ -13,10 +22,12 @@ const WalletBalance = () => {
 
             <div className="text-3xl font-semibold">
               {"10200"}
+              {data?.formatted}
             </div>
 
             <div className="font-bold text-sm">
               {"BKSD"}
+              {data?.symbol}
             </div>
           </div>
 

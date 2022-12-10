@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import Hero from './Hero';
 import { Inter } from '@next/font/google'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -20,6 +22,7 @@ const Layout: FC<{ children: JSX.Element, heroContent?: JSX.Element, variant?: b
           children
         }
       </div>
+      <ToastContainer />
     </div>
   );
 };
