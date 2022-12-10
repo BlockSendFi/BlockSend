@@ -182,7 +182,7 @@ export class TransferService implements OnApplicationBootstrap {
     );
     const offchainProviderParams = {
       mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
-      amount: transfer.amountWithoutFees.toNumber(),
+      amount: transfer.amountWithoutFees,
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,
       origin: {
@@ -240,11 +240,11 @@ export class TransferService implements OnApplicationBootstrap {
       })
       .exec();
 
-    this.notifyOffchainProvider({
-      ...transfer,
-      amountWithoutFees: amountWithoutFees.toNumber(),
-      status: TransferStatus.ONCHAIN_TRANSFER_DONE,
-    });
+    const transferUpdated = await this.transferModel
+      .findById(transferId)
+      .lean();
+
+    this.notifyOffchainProvider(transferUpdated);
 
     return await this.transferModel.findById(transferId);
   }
