@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
-contract StakingRewards is Ownable {
+contract BlockSendStakingRewards is Ownable {
     address private USDC_TOKEN_CONTRACT =
         0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
@@ -48,7 +48,7 @@ contract StakingRewards is Ownable {
         _;
     }
 
-    function claimTokens(uint256 _amount) external updateReward(msg.sender) {
+    function claimStakingRewards(uint256 _amount) external updateReward(msg.sender) {
         //mint Tokens
         // bKSDToken.mint(msg.sender, _amount);
         // bKSDToken.transfer(msg.sender, _amount);

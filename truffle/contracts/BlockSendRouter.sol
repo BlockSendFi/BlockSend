@@ -9,7 +9,6 @@ import "./interfaces/ISynthereum.sol";
 import "./BlockSendToken.sol";
 
 contract BlockSendRouter is Ownable {
-    AggregatorV3Interface private priceFeed;
 
     IFixedRateWrapper private jarvisWrapper;
     ISynthereum private jarvisSynthereum;
@@ -34,6 +33,9 @@ contract BlockSendRouter is Ownable {
 
     address private EUR_USD_AGGREGATOR =
         0x73366Fe0AA0Ded304479862808e02506FE556a98;
+    address private USDC_USD_AGGREGATOR =
+        0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7;
+
     address private HUB2_WALLET = 0xeD85CAeb52C34bD35dfeEB2d4e0bC936a0Db0923;
     address private BLOCKSEND_BACKEND =
         0x913Cd67dA3b17be7f66E865158cDF9a5c4F2a850;
@@ -46,8 +48,10 @@ contract BlockSendRouter is Ownable {
         uint256 amount_EURe;
         uint256 amount_jEUR;
         uint256 amount_USDC;
+        uint256 rate_EUR_USDC;
         uint256 userAmount_USDC;
         uint256 blocksendAmount_USDC;
+        uint256 jarvisFees_USDC;
         TransferStatus status;
     }
 
@@ -64,11 +68,6 @@ contract BlockSendRouter is Ownable {
     mapping(address => bool) private allowed;
 
     event TransferInitilized(string transferId, uint256 amount);
-    event TransferStatusChanged(
-        string transferId,
-        TransferStatus currentStatus,
-        string errorMsg
-    );
     event TransferFinalized(
         string transferId,
         uint256 userAmount,
@@ -88,7 +87,6 @@ contract BlockSendRouter is Ownable {
         moneriumEURemoney = IERC20(EURE_TOKEN_CONTRACT);
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
-        priceFeed = AggregatorV3Interface(EUR_USD_AGGREGATOR);
         BKSDToken = BlockSendToken(_blocksSendTokenAdress);
     }
 
@@ -114,18 +112,13 @@ contract BlockSendRouter is Ownable {
         address userWallet,
         uint256 amount
     ) external onlyAllowed returns (bool ok) {
+        require(amount >= 5 * 10e17, "insufficient amount");
+
         initilizeTransferData(transferId, userWallet, amount);
-
-        // TODO: check the minimal amount here
-        // TODO: Remove useless events
-        // TODO: Add a function to expose rate EUR/USDC to the frontend
-        // TODO: Add a function to expose rate USDC/XOF to the frontend
-
-        transferRewardsBalance[userWallet] += amount / 2;
 
         bool okGetEURe = transferFrom(transferId, userWallet, amount);
         if (!okGetEURe) {
-            TransferStuck(transferId, userWallet, amount, "");
+            TransferStuck(transferId, userWallet, amount);
             return false;
         }
 
@@ -135,34 +128,32 @@ contract BlockSendRouter is Ownable {
             amount
         );
         if (!okApproveWrap || amountJEUR == 0) {
-            TransferStuck(transferId, userWallet, amount, "");
+            TransferStuck(transferId, userWallet, amount);
             return false;
         }
-
-        uint256 price = getLatestPrice();
-        uint256 collateralUSDC = uint256((amountJEUR * price) / 10e18);
 
         (
             bool okApprouveJEUR,
             bool okApprouveUSDC,
             uint256 collateralRedeemed,
             uint256 feePaid
-        ) = routage_USDCfromjEUR(transferId, amountJEUR, collateralUSDC);
-        if (
-            !okApprouveJEUR ||
-            !okApprouveUSDC ||
-            collateralRedeemed == 0 ||
-            feePaid == 0
-        ) {
-            TransferStuck(transferId, userWallet, amount, "");
+        ) = routage_USDCfromjEUR(transferId, amountJEUR);
+        if (!okApprouveJEUR || !okApprouveUSDC || collateralRedeemed == 0) {
+            TransferStuck(transferId, userWallet, amount);
             return false;
         }
 
-        bool okTransferWallet = transferUSDC(transferId, collateralRedeemed);
+        bool okTransferWallet = transferUSDC(
+            transferId,
+            collateralRedeemed,
+            feePaid
+        );
         if (!okTransferWallet) {
-            TransferStuck(transferId, userWallet, amount, "");
+            TransferStuck(transferId, userWallet, amount);
             return false;
         }
+        
+        transferRewardsBalance[userWallet] += amount / 2;
 
         finalizeTransfer(transferId);
 
@@ -180,135 +171,119 @@ contract BlockSendRouter is Ownable {
     /**
      * Returns the current status of a specific remmitance.
      */
-    function remittanceStatus(string calldata transferId)
-        public
-        view
-        virtual
-        returns (TransferStatus)
-    {
-        return transfers[transferId].status;
+    function remittanceStatus(
+        string calldata _transferId
+    ) public view virtual returns (TransferStatus) {
+        return transfers[_transferId].status;
     }
 
     // *********************** Manage Status changed ************************************
     function initilizeTransferData(
-        string calldata transferId,
-        address userWallet,
-        uint256 amount
+        string calldata _transferId,
+        address _userWallet,
+        uint256 _amount
     ) internal {
-        transfers[transferId].sender = userWallet;
-        transfers[transferId].status = TransferStatus.INITIALIZED;
+        transfers[_transferId].sender = _userWallet;
+        transfers[_transferId].status = TransferStatus.INITIALIZED;
 
-        emit TransferInitilized(transferId, amount);
+        emit TransferInitilized(_transferId, _amount);
     }
 
-    function finalizeTransfer(string calldata transferId) internal {
-        transfers[transferId].status = TransferStatus.FINALIZED;
+    function finalizeTransfer(string calldata _transferId) internal {
+        transfers[_transferId].status = TransferStatus.FINALIZED;
 
         emit TransferFinalized(
-            transferId,
-            transfers[transferId].userAmount_USDC,
-            transfers[transferId].blocksendAmount_USDC
+            _transferId,
+            transfers[_transferId].userAmount_USDC,
+            transfers[_transferId].blocksendAmount_USDC
         );
     }
 
-    function amountReceived(string calldata transferId, uint256 amount)
-        internal
-    {
-        transfers[transferId].status = TransferStatus.EURE_RECEIVED;
-        transfers[transferId].amount_EURe = amount;
-
-        emit TransferStatusChanged(
-            transferId,
-            TransferStatus.EURE_RECEIVED,
-            ""
-        );
+    function amountReceived(
+        string calldata _transferId,
+        uint256 _amount
+    ) internal {
+        transfers[_transferId].status = TransferStatus.EURE_RECEIVED;
+        transfers[_transferId].amount_EURe = _amount;
     }
 
-    function amountWrapped(string calldata transferId, uint256 amount)
-        internal
-    {
-        transfers[transferId].status = TransferStatus.JEUR_WRAPPED;
-        transfers[transferId].amount_jEUR = amount;
-
-        emit TransferStatusChanged(transferId, TransferStatus.JEUR_WRAPPED, "");
+    function amountWrapped(
+        string calldata _transferId,
+        uint256 _amount
+    ) internal {
+        transfers[_transferId].status = TransferStatus.JEUR_WRAPPED;
+        transfers[_transferId].amount_jEUR = _amount;
     }
 
-    function redeemCollateral(string calldata transferId, uint256 collateral)
-        internal
-    {
-        transfers[transferId].status = TransferStatus.USDC_RECEIVED;
-        transfers[transferId].amount_USDC = collateral;
-
-        emit TransferStatusChanged(
-            transferId,
-            TransferStatus.USDC_RECEIVED,
-            ""
-        );
+    function redeemCollateral(
+        string calldata _transferId,
+        uint256 _collateral,
+        uint256 _rate,
+        uint256 _feePaid
+    ) internal {
+        transfers[_transferId].status = TransferStatus.USDC_RECEIVED;
+        transfers[_transferId].amount_USDC = _collateral;
+        transfers[_transferId].rate_EUR_USDC = _rate;
+        transfers[_transferId].jarvisFees_USDC = _feePaid;
     }
 
     function collateralSent(
-        string calldata transferId,
-        uint256 userAmount,
-        uint256 blocksendAmount
+        string calldata _transferId,
+        uint256 _userAmount,
+        uint256 _blockSendAmount
     ) internal {
-        transfers[transferId].status = TransferStatus.USDC_SENT;
-        transfers[transferId].userAmount_USDC = userAmount;
-        transfers[transferId].blocksendAmount_USDC = blocksendAmount;
-
-        emit TransferStatusChanged(transferId, TransferStatus.USDC_SENT, "");
+        transfers[_transferId].status = TransferStatus.USDC_SENT;
+        transfers[_transferId].userAmount_USDC = _userAmount;
+        transfers[_transferId].blocksendAmount_USDC = _blockSendAmount;
     }
 
     function TransferStuck(
-        string calldata transferId,
-        address userWallet,
-        uint256 amount,
-        string memory errorMsg
+        string calldata _transferId,
+        address _userWallet,
+        uint256 _amount
     ) internal returns (bool ok) {
-        transfers[transferId].status = TransferStatus.TRANSFER_STUCK;
+        transfers[_transferId].status = TransferStatus.TRANSFER_STUCK;
 
-        ok = moneriumEURemoney.transfer(userWallet, amount);
-
-        emit TransferStatusChanged(
-            transferId,
-            TransferStatus.TRANSFER_STUCK,
-            errorMsg
-        );
+        ok = moneriumEURemoney.transfer(_userWallet, _amount);
     }
 
     // *********************************************************************************
 
     // *********************** GET EURe from user's wallet *****************************
     function transferFrom(
-        string calldata transferId,
-        address userWallet,
-        uint256 amount
+        string calldata _transferId,
+        address _userWallet,
+        uint256 _amount
     ) internal returns (bool ok) {
-        ok = moneriumEURemoney.transferFrom(userWallet, address(this), amount);
+        ok = moneriumEURemoney.transferFrom(
+            _userWallet,
+            address(this),
+            _amount
+        );
 
-        amountReceived(transferId, amount);
+        amountReceived(_transferId, _amount);
     }
 
     // *********************************************************************************
 
     // *********************** Wrap EURe to JEUR ***************************************
     function routage_jEURfromEURe(
-        string calldata transferId,
-        uint256 amount,
-        uint256 collateral
+        string calldata _transferId,
+        uint256 _amount,
+        uint256 _collateral
     ) internal returns (bool ok, uint256 amountTokens) {
-        ok = moneriumEURemoney.approve(WRAPPER_CONTRACT, amount);
-        amountTokens = jarvisWrapper.wrap(collateral, address(this));
+        ok = moneriumEURemoney.approve(WRAPPER_CONTRACT, _amount);
+        amountTokens = jarvisWrapper.wrap(_collateral, address(this));
 
-        amountWrapped(transferId, amountTokens);
+        amountWrapped(_transferId, amountTokens);
     }
 
     // *********************************************************************************
 
     // *********************** Wurn & Mint (Redeem) UCDS from JEUR *********************
     function routage_USDCfromjEUR(
-        string calldata transferId,
-        uint256 _numToken,
-        uint256 _minCollateral
+        string calldata _transferId,
+        uint256 _numToken
     )
         internal
         returns (
@@ -318,30 +293,35 @@ contract BlockSendRouter is Ownable {
             uint256 feePaid
         )
     {
+        uint256 price = get_EUR_USD_LatestPrice();
+        uint256 collateralUSDC = uint256((_numToken * price) / 10e18);
+
         okApprouveJEUR = jEURToken.approve(SYNTHEREUM_CONTRACT, _numToken);
-        okApprouveUSDC = USDCToken.approve(SYNTHEREUM_CONTRACT, _minCollateral);
+        okApprouveUSDC = USDCToken.approve(SYNTHEREUM_CONTRACT, collateralUSDC);
 
         ISynthereum.RedeemParams memory params = ISynthereum.RedeemParams({
             numTokens: _numToken,
-            minCollateral: _minCollateral,
+            minCollateral: collateralUSDC,
             expiration: block.timestamp + 30,
             recipient: address(this)
         });
 
         (collateralRedeemed, feePaid) = jarvisSynthereum.redeem(params);
 
-        redeemCollateral(transferId, collateralRedeemed);
+        redeemCollateral(_transferId, collateralRedeemed, price, feePaid);
     }
 
     // *********************************************************************************
 
     // *********************** Transfer USDC to HUB2 Wallet & BlockSend Wallet *********
     function transferUSDC(
-        string calldata transferId,
-        uint256 collateralRedeemed
+        string calldata _transferId,
+        uint256 _collateralRedeemed,
+        uint256 _feePaid
     ) internal returns (bool ok) {
-        (uint256 blocksendAmount, uint256 userAmount) = calculateFees(
-            collateralRedeemed
+        (uint256 blocksendAmount, uint256 userAmount) = calculateBlockSendFees(
+            _collateralRedeemed,
+            _feePaid
         );
 
         bool okBlocksend = USDCToken.transfer(
@@ -350,7 +330,7 @@ contract BlockSendRouter is Ownable {
         );
         bool okHUB2 = USDCToken.transfer(HUB2_WALLET, userAmount);
 
-        collateralSent(transferId, userAmount, blocksendAmount);
+        collateralSent(_transferId, userAmount, blocksendAmount);
 
         return okHUB2 && okBlocksend;
     }
@@ -358,58 +338,53 @@ contract BlockSendRouter is Ownable {
     // *********************************************************************************
 
     // *********************** Calculate 1,9% fees *************************************
-    function calculateFees(uint256 amount)
-        internal
-        pure
-        returns (uint256 blocksendAmount, uint256 userAmount)
-    {
-        blocksendAmount = (amount * 19) / 1000;
-        userAmount = amount - blocksendAmount;
+    function calculateBlockSendFees(
+        uint256 _amount,
+        uint256 _feePaid
+    ) internal pure returns (uint256 blocksendAmount, uint256 userAmount) {
+        blocksendAmount = ((_amount * 19) / 1000) - _feePaid;
+        userAmount = _amount - blocksendAmount;
     }
 
     // *********************************************************************************
 
     // *********************** Update Contracts Addresses ******************************
-    function setWrapperContract(address newAddress) external onlyOwner {
-        WRAPPER_CONTRACT = newAddress;
+    function setWrapperContract(address _newAddress) external onlyOwner {
+        WRAPPER_CONTRACT = _newAddress;
         jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
     }
 
-    function setSyntheriumContract(address newAddress) external onlyOwner {
-        SYNTHEREUM_CONTRACT = newAddress;
+    function setSyntheriumContract(address _newAddress) external onlyOwner {
+        SYNTHEREUM_CONTRACT = _newAddress;
         jarvisSynthereum = ISynthereum(SYNTHEREUM_CONTRACT);
     }
 
-    function setEURETokenContract(address newAddress) external onlyOwner {
-        EURE_TOKEN_CONTRACT = newAddress;
+    function setEURETokenContract(address _newAddress) external onlyOwner {
+        EURE_TOKEN_CONTRACT = _newAddress;
         moneriumEURemoney = IERC20(EURE_TOKEN_CONTRACT);
     }
 
-    function setJEURToken_Contract(address newAddress) external onlyOwner {
-        JEUR_TOKEN_CONTRACT = newAddress;
+    function setJEURToken_Contract(address _newAddress) external onlyOwner {
+        JEUR_TOKEN_CONTRACT = _newAddress;
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
     }
 
-    function setBKSDTokenContract(address newAddress) external onlyOwner {
-        BKSDToken = BlockSendToken(newAddress);
+    function setBKSDTokenContract(address _newAddress) external onlyOwner {
+        BKSD_TOKEN_CONTRACT = _newAddress;
+        BKSDToken = BlockSendToken(BKSD_TOKEN_CONTRACT);
     }
 
-    function setUSDCTokenContract(address newAddress) external onlyOwner {
-        USDC_TOKEN_CONTRACT = newAddress;
+    function setUSDCTokenContract(address _newAddress) external onlyOwner {
+        USDC_TOKEN_CONTRACT = _newAddress;
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
     }
 
-    function setEUR_USD_Aggregator(address newAddress) external onlyOwner {
-        EUR_USD_AGGREGATOR = newAddress;
-        priceFeed = AggregatorV3Interface(EUR_USD_AGGREGATOR);
+    function setHUB2Wallet(address _newAddress) external onlyOwner {
+        HUB2_WALLET = _newAddress;
     }
 
-    function setHUB2Wallet(address newAddress) external onlyOwner {
-        HUB2_WALLET = newAddress;
-    }
-
-    function setBlockSend_Wallet(address newAddress) external onlyOwner {
-        BLOCKSEND_WALLET = newAddress;
+    function setBlockSend_Wallet(address _newAddress) external onlyOwner {
+        BLOCKSEND_WALLET = _newAddress;
     }
 
     function AllowAddress(address _addr) external onlyOwner {
@@ -419,8 +394,12 @@ contract BlockSendRouter is Ownable {
     // *********************************************************************************
 
     // *********************** Get the latest rate *************************************
-    function getLatestPrice() public view returns (uint256) {
-        (, int256 price, , , ) = priceFeed.latestRoundData();
+    function get_EUR_USD_LatestPrice() public view returns (uint256) {
+        (, int256 price, , , ) = AggregatorV3Interface(EUR_USD_AGGREGATOR).latestRoundData();
+        return uint256(price / 1000);
+    }
+    function get_USDC_USD_LatestPrice() public view returns (uint256) {
+        (, int256 price, , , ) = AggregatorV3Interface(USDC_USD_AGGREGATOR).latestRoundData();
         return uint256(price / 1000);
     }
     // *********************************************************************************
