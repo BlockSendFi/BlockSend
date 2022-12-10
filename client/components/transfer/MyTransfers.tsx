@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { useQuery } from 'react-query';
 import getMyTransfersQuery from '../../api/get-my-transfers-query.api';
 import { AuthContext } from '../../contexts/auth.context';
+import { LayoutContext } from '../../contexts/layout.context';
+import { ModalEnum } from '../../enums/modal.enum';
 import ITransfer from '../../interfaces/transfer.interface';
 import Button from '../common/Button';
 import Loader from '../common/Loader';
@@ -11,12 +13,17 @@ const MyTransfers = () => {
   const { accessToken } = useContext(AuthContext)
   const { data, isLoading, isError, error } = useQuery("myTransfers", () => getMyTransfersQuery(accessToken as string))
   const transfers = data?.data || []
+  const { openModal } = useContext(LayoutContext)
+
+  const handleNewTransfer = () => openModal(ModalEnum.NEW_TRANSFER)
 
   return (
     <div className="flex flex-col gap-4 flex-grow">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{"Mes transferts"}</h2>
-        <Button title="Nouveau transfert" />
+
+
+        <Button title="Nouveau transfert" onClick={handleNewTransfer} />
       </div>
 
       {

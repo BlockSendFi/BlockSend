@@ -15,11 +15,11 @@ const inter = Inter({
 const ModalContainer: FC<{ onClose: () => void; modal: IModalContext | null }> = ({ onClose, modal }) => {
   return (
     <Dialog open={!!modal} onClose={onClose} className={clsx(
-      'fixed z-50 inset-0 flex flex-col items-center justify-center',
+      'fixed z-50 inset-0 flex flex-col items-center justify-center ',
       inter.className
     )}>
       <div
-        className={clsx(`bg-white relative mx-6 p-10 rounded-xl z-40 overflow-auto`, {
+        className={clsx(`bg-white relative mx-6 p-10 rounded-xl z-40 overflow-auto min-w-[480px]`, {
           'overflow-auto': (modal?.opts || {}).overflow
         })}
         style={{

@@ -3,7 +3,7 @@ import { useAccount, useNetwork } from 'wagmi';
 import DetectWallet from '../common/DetectWallet';
 import MyContacts from '../contact/MyContacts';
 import MyTransfers from '../transfer/MyTransfers';
-import WalletBalance from '../transfer/WalletBalance';
+import WalletBalance from '../wallet/WalletBalance';
 
 const InnerApp = () => {
   const { chain } = useNetwork()

@@ -3,7 +3,6 @@ import {
   Injectable,
   Logger,
   OnApplicationBootstrap,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -13,8 +12,8 @@ import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
 import { BigNumber, ethers } from 'ethers';
-import ERC20ABI from '../contracts/ERC20.json';
-import BlockSendTransferABI from '../contracts/BlockSendTransfer.json';
+import ERC20 from '../../contracts/ERC20.json';
+import BlockSendRouter from '../../contracts/BlockSendRouter.json';
 import { UserService } from './user.service';
 
 interface IOptionsTx {
@@ -44,7 +43,7 @@ export class TransferService implements OnApplicationBootstrap {
 
     this.EUReContract = new ethers.Contract(
       process.env.MONERIUM_EURE_ADDRESS,
-      ERC20ABI.abi,
+      ERC20.abi,
       this.provider,
     );
 
@@ -55,7 +54,7 @@ export class TransferService implements OnApplicationBootstrap {
 
     this.BlockSendContract = new ethers.Contract(
       process.env.BLOCKSEND_ROUTER_ADDRESS,
-      BlockSendTransferABI.abi,
+      BlockSendRouter.abi,
       this.signer,
 
       // { gasPrice: ethers.utils.parseUnits('100', 'gwei'), gasLimit: 1000000 },
@@ -110,19 +109,11 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   async initTransfer(initTransferInput, user) {
-    const contact = await this.contactService.getContact(
-      initTransferInput.contact,
-    );
-
-    if (!contact.user.equals(user._id)) {
-      throw new UnauthorizedException('Contact does not belong to user');
-    }
-
     const transfer = await new this.transferModel({
       user: user._id,
       userWalletAddress: initTransferInput.walletAddress,
       amount: initTransferInput.amount,
-      recipient: _.pick(contact, 'firstName', 'lastName', 'phoneNumber'),
+      recipient: initTransferInput.recipient,
     }).save();
 
     await this.checkBalanceAndStartTransfer(transfer);
@@ -155,8 +146,7 @@ export class TransferService implements OnApplicationBootstrap {
       const tx = await this.BlockSendContract.initializeTransfer(
         transfer._id.toString(),
         transfer.userWalletAddress,
-        // '500000000000000000',
-        amountDecimals, // '500000000000000000',
+        amountDecimals,
         optionsTx,
       );
 

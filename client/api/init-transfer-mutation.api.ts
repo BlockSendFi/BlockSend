@@ -1,10 +1,11 @@
 import axios from 'axios'
+import IRecipient from '../interfaces/recipient.interface'
 
 const initTransferMutation = ({ initTransferInput, accessToken }: {
   initTransferInput: {
     amount: number,
     walletAddress: string,
-    contact: string
+    recipient: IRecipient
   },
   accessToken: string
 }) => {
