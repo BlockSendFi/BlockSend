@@ -26,7 +26,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_collateral\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_recipient\",\"type\":\"address\"}],\"name\":\"wrap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountTokens\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"wrap(uint256,address)\":{\"params\":{\"_collateral\":\"The amount of peg collateral tokens to be deposited\",\"_recipient\":\"The address of the recipient to receive the newly minted fixed rate synthetic tokens\"},\"returns\":{\"amountTokens\":\"The amount of newly minted fixed rate synthetic tokens\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"wrap(uint256,address)\":{\"notice\":\"This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokensThe conversion is based on a fixed rate\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IFixedRateWrapper.sol\":\"IFixedRateWrapper\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/IFixedRateWrapper.sol\":{\"keccak256\":\"0x8684537dff39666da50775987b0a566d2fcd8c68f373921b0e35a41c00e0d2a1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c60490e9a56bd0558e2062bae95a5f7544da8da2a8cf2cd303f40e082378807e\",\"dweb:/ipfs/QmY4zorSdLMCGUaFB8t5yz32sPiqXUcr98qstxGbgPvMRy\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_collateral\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_recipient\",\"type\":\"address\"}],\"name\":\"wrap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountTokens\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"wrap(uint256,address)\":{\"params\":{\"_collateral\":\"The amount of peg collateral tokens to be deposited\",\"_recipient\":\"The address of the recipient to receive the newly minted fixed rate synthetic tokens\"},\"returns\":{\"amountTokens\":\"The amount of newly minted fixed rate synthetic tokens\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"wrap(uint256,address)\":{\"notice\":\"This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokensThe conversion is based on a fixed rate\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IFixedRateWrapper.sol\":\"IFixedRateWrapper\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/IFixedRateWrapper.sol\":{\"keccak256\":\"0x2d7ffd86ab0920495a9a30053041e8a893d5b6d535ba60be11df2af742cdfa8b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7192b3eb9218a153ef82b33c53ed3e99a89f1109fbd98d069905daec32597db5\",\"dweb:/ipfs/QmbLGTDUn4bpCxXNCxZjqBiNnjdJwu4ZzGKvnWyCW7jaFX\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -34,21 +34,32 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.9;\r\n\r\ninterface IFixedRateWrapper {\r\n    /** \r\n     * @notice This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokens\r\n     * @notice The conversion is based on a fixed rate\r\n     * @param _collateral The amount of peg collateral tokens to be deposited\r\n     * @param _recipient The address of the recipient to receive the newly minted fixed rate synthetic tokens\r\n     * @return amountTokens The amount of newly minted fixed rate synthetic tokens\r\n    */\r\n   function wrap(uint256 _collateral, address _recipient) external returns (uint256 amountTokens);\r\n}",
-  "sourcePath": "C:\\Users\\zguai\\Desktop\\Repos\\BlockSend\\truffle\\contracts\\interfaces\\IFixedRateWrapper.sol",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.9;\n\ninterface IFixedRateWrapper {\n    /** \n     * @notice This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokens\n     * @notice The conversion is based on a fixed rate\n     * @param _collateral The amount of peg collateral tokens to be deposited\n     * @param _recipient The address of the recipient to receive the newly minted fixed rate synthetic tokens\n     * @return amountTokens The amount of newly minted fixed rate synthetic tokens\n    */\n   function wrap(uint256 _collateral, address _recipient) external returns (uint256 amountTokens);\n}",
+  "sourcePath": "/Users/fabricepayet/Workspace/blocksend/blocksend/truffle/contracts/interfaces/IFixedRateWrapper.sol",
   "ast": {
     "absolutePath": "project:/contracts/interfaces/IFixedRateWrapper.sol",
     "exportedSymbols": {
       "IFixedRateWrapper": [
+<<<<<<< HEAD
         1434
       ]
     },
     "id": 1435,
+=======
+        1520
+      ]
+    },
+    "id": 1521,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
+<<<<<<< HEAD
         "id": 1423,
+=======
+        "id": 1509,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
         "literals": [
           "solidity",
           "^",
@@ -56,7 +67,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:3"
+        "src": "32:23:3"
       },
       {
         "abstract": false,
@@ -65,42 +76,69 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
+<<<<<<< HEAD
         "id": 1434,
         "linearizedBaseContracts": [
           1434
+=======
+        "id": 1520,
+        "linearizedBaseContracts": [
+          1520
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
         ],
         "name": "IFixedRateWrapper",
-        "nameLocation": "70:17:3",
+        "nameLocation": "67:17:3",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
+<<<<<<< HEAD
               "id": 1424,
+=======
+              "id": 1510,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
               "nodeType": "StructuredDocumentation",
-              "src": "95:456:3",
+              "src": "91:450:3",
               "text": " @notice This function is used to mint new fixed rate synthetic tokens by depositing peg collateral tokens\n @notice The conversion is based on a fixed rate\n @param _collateral The amount of peg collateral tokens to be deposited\n @param _recipient The address of the recipient to receive the newly minted fixed rate synthetic tokens\n @return amountTokens The amount of newly minted fixed rate synthetic tokens"
             },
             "functionSelector": "13bac820",
+<<<<<<< HEAD
             "id": 1433,
+=======
+            "id": 1519,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "wrap",
-            "nameLocation": "565:4:3",
+            "nameLocation": "554:4:3",
             "nodeType": "FunctionDefinition",
             "parameters": {
+<<<<<<< HEAD
               "id": 1429,
+=======
+              "id": 1515,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
+<<<<<<< HEAD
                   "id": 1426,
+=======
+                  "id": 1512,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "mutability": "mutable",
                   "name": "_collateral",
-                  "nameLocation": "578:11:3",
+                  "nameLocation": "567:11:3",
                   "nodeType": "VariableDeclaration",
+<<<<<<< HEAD
                   "scope": 1433,
                   "src": "570:19:3",
+=======
+                  "scope": 1519,
+                  "src": "559:19:3",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -108,10 +146,14 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
+<<<<<<< HEAD
                     "id": 1425,
+=======
+                    "id": 1511,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "570:7:3",
+                    "src": "559:7:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -121,13 +163,22 @@
                 },
                 {
                   "constant": false,
+<<<<<<< HEAD
                   "id": 1428,
+=======
+                  "id": 1514,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "mutability": "mutable",
                   "name": "_recipient",
-                  "nameLocation": "599:10:3",
+                  "nameLocation": "588:10:3",
                   "nodeType": "VariableDeclaration",
+<<<<<<< HEAD
                   "scope": 1433,
                   "src": "591:18:3",
+=======
+                  "scope": 1519,
+                  "src": "580:18:3",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -135,10 +186,14 @@
                     "typeString": "address"
                   },
                   "typeName": {
+<<<<<<< HEAD
                     "id": 1427,
+=======
+                    "id": 1513,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "591:7:3",
+                    "src": "580:7:3",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -148,21 +203,34 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "569:41:3"
+              "src": "558:41:3"
             },
             "returnParameters": {
+<<<<<<< HEAD
               "id": 1432,
+=======
+              "id": 1518,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
+<<<<<<< HEAD
                   "id": 1431,
+=======
+                  "id": 1517,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "mutability": "mutable",
                   "name": "amountTokens",
-                  "nameLocation": "637:12:3",
+                  "nameLocation": "626:12:3",
                   "nodeType": "VariableDeclaration",
+<<<<<<< HEAD
                   "scope": 1433,
                   "src": "629:20:3",
+=======
+                  "scope": 1519,
+                  "src": "618:20:3",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -170,10 +238,14 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
+<<<<<<< HEAD
                     "id": 1430,
+=======
+                    "id": 1516,
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "629:7:3",
+                    "src": "618:7:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -182,21 +254,31 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "628:22:3"
+              "src": "617:22:3"
             },
+<<<<<<< HEAD
             "scope": 1434,
             "src": "556:95:3",
+=======
+            "scope": 1520,
+            "src": "545:95:3",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
+<<<<<<< HEAD
         "scope": 1435,
         "src": "60:594:3",
+=======
+        "scope": 1521,
+        "src": "57:585:3",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
         "usedErrors": []
       }
     ],
-    "src": "33:621:3"
+    "src": "32:610:3"
   },
   "compiler": {
     "name": "solc",
@@ -204,7 +286,11 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
+<<<<<<< HEAD
   "updatedAt": "2022-12-10T12:49:41.819Z",
+=======
+  "updatedAt": "2022-12-10T10:14:01.075Z",
+>>>>>>> 79f555d7680cba7855616add98eb22090a1e6f4b
   "devdoc": {
     "kind": "dev",
     "methods": {

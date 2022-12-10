@@ -73,12 +73,6 @@ export class TransferService implements OnApplicationBootstrap {
       .exec();
   }
 
-  private onTransferStatusChanged(transferId, status, error) {
-    this.logger.log(
-      `Transfer ${transferId} changed status to ${status} (Error : ${error})`,
-    );
-  }
-
   private onTransferFinalized(transferId, amountWithoutFees) {
     this.logger.log(
       `Transfer ${transferId} finalized (amountWithoutFees: ${amountWithoutFees})`,
@@ -92,10 +86,7 @@ export class TransferService implements OnApplicationBootstrap {
       'TransferInitilized',
       this.onTransferInitialized.bind(this),
     );
-    this.BlockSendContract.on(
-      'TransferStatusChanged',
-      this.onTransferStatusChanged.bind(this),
-    );
+
     this.BlockSendContract.on(
       'TransferFinalized',
       this.onTransferFinalized.bind(this),
@@ -139,7 +130,10 @@ export class TransferService implements OnApplicationBootstrap {
     );
     try {
       const optionsTx: IOptionsTx = {
-        gasPrice: ethers.utils.parseUnits('40.0', 'gwei'),
+        gasPrice:
+          process.env.NODE_ENV === 'development'
+            ? ethers.utils.parseUnits('50.0', 'gwei')
+            : ethers.utils.parseUnits('80.0', 'gwei'),
         gasLimit: ethers.utils.parseUnits('0.008', 'gwei'),
       };
 

@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Dialog } from '@headlessui/react'
 import TransferRecipient from './TransferRecipient';
 import ITransfer from '../../interfaces/transfer.interface';

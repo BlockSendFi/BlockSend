@@ -39,7 +39,7 @@ const MyContacts = () => {
                       <div className="flex flex-col gap-2">
                         {
                           contacts.map((contact: IContact, index: number) => (
-                            <ContactItem key={index} contact={contact} />
+                            <ContactItem key={index} contact={contact} onClick={() => null} />
                           ))
                         }
                       </div>
