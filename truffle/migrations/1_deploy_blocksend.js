@@ -1,6 +1,6 @@
 const BlockSendToken = artifacts.require("BlockSendToken");
 const BlockSendRouter = artifacts.require("BlockSendRouter");
-const BlockSendStakingRewards = artifacts.require("BlockSendStakingRewards");
+// const BlockSendStakingRewards = artifacts.require("BlockSendStakingRewards");
 
 module.exports = async function (deployer) {
   await deployer.deploy(BlockSendToken)
@@ -9,8 +9,8 @@ module.exports = async function (deployer) {
   await deployer.deploy(BlockSendRouter, blockSendTokenInstance.address);
   const blockSendRouterInstance = await BlockSendRouter.deployed()
   
-  await deployer.deploy(BlockSendStakingRewards, blockSendTokenInstance.address);
-  const BlockSendStakingRewards = await BlockSendStakingRewards.deployed()
+  // await deployer.deploy(BlockSendStakingRewards, blockSendTokenInstance.address);
+  // const BlockSendStakingRewardsInstance = await BlockSendStakingRewards.deployed()
 
   await blockSendTokenInstance.setMinter(blockSendRouterInstance.address)
 

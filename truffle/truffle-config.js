@@ -1,5 +1,6 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config();
+const web3 = require("web3")
 
 module.exports = {
   contracts_build_directory: "../client/contracts",
@@ -15,7 +16,7 @@ module.exports = {
       },
       network_id: "5",
     },
-    matic: {
+    matictestnet: {
       provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_ID}`),
       network_id: 80001,
       confirmations: 2,
@@ -26,7 +27,13 @@ module.exports = {
       provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://avalanche-fuji.infura.io/v3/${process.env.INFURA_ID}`),
       network_id: 43113,
       skipDryRun: true
-    }
+    },
+		maticmainnet: {
+			provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_ID}`),
+			network_id: '137',
+      gas: 4600000,
+      gasPrice: web3.utils.toWei("50", "gwei"),
+		},
   },
 
   // Set default mocha options here, use special reporters, etc.

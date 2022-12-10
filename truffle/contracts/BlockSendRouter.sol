@@ -9,7 +9,6 @@ import "./interfaces/ISynthereum.sol";
 import "./BlockSendToken.sol";
 
 contract BlockSendRouter is Ownable {
-
     IFixedRateWrapper private jarvisWrapper;
     ISynthereum private jarvisSynthereum;
     IERC20 private moneriumEURemoney;
@@ -28,8 +27,8 @@ contract BlockSendRouter is Ownable {
         0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c;
     address private USDC_TOKEN_CONTRACT =
         0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
-    address private BKSD_TOKEN_CONTRACT =
-        0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c; // TODO: change this
+    // address private BKSD_TOKEN_CONTRACT =
+    //     0x8d587d2Eaac88e6E228300180c921674a27ABFf3; // TODO: change this
 
     address private EUR_USD_AGGREGATOR =
         0x73366Fe0AA0Ded304479862808e02506FE556a98;
@@ -80,14 +79,14 @@ contract BlockSendRouter is Ownable {
         _;
     }
 
-    constructor(address _blocksSendTokenAdress) {
+    constructor(address _BKSD_TOKEN_CONTRACT) {
         allowed[BLOCKSEND_BACKEND] = true;
         jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
         jarvisSynthereum = ISynthereum(SYNTHEREUM_CONTRACT);
         moneriumEURemoney = IERC20(EURE_TOKEN_CONTRACT);
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
-        BKSDToken = BlockSendToken(_blocksSendTokenAdress);
+        BKSDToken = BlockSendToken(_BKSD_TOKEN_CONTRACT);
     }
 
     /**
@@ -112,7 +111,7 @@ contract BlockSendRouter is Ownable {
         address userWallet,
         uint256 amount
     ) external onlyAllowed returns (bool ok) {
-        require(amount >= 5 * 10e17, "insufficient amount");
+        // require(amount >= 5 * 10e17, "insufficient amount");
 
         initilizeTransferData(transferId, userWallet, amount);
 
@@ -152,7 +151,7 @@ contract BlockSendRouter is Ownable {
             TransferStuck(transferId, userWallet, amount);
             return false;
         }
-        
+
         transferRewardsBalance[userWallet] += amount / 2;
 
         finalizeTransfer(transferId);
@@ -160,11 +159,7 @@ contract BlockSendRouter is Ownable {
         return true;
     }
 
-    function getMyTranferRewardsBalance()
-        external
-        view
-        returns (uint256)
-    {
+    function getMyTranferRewardsBalance() external view returns (uint256) {
         return transferRewardsBalance[msg.sender];
     }
 
@@ -301,7 +296,7 @@ contract BlockSendRouter is Ownable {
             uint256 feePaid
         )
     {
-        uint256 price = get_EUR_USD_LatestPrice();
+        uint256 price = 105400;
         uint256 collateralUSDC = uint256((_numToken * price) / 10e18);
 
         okApprouveJEUR = jEURToken.approve(SYNTHEREUM_CONTRACT, _numToken);
@@ -377,11 +372,6 @@ contract BlockSendRouter is Ownable {
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
     }
 
-    function setBKSDTokenContract(address _newAddress) external onlyOwner {
-        BKSD_TOKEN_CONTRACT = _newAddress;
-        BKSDToken = BlockSendToken(BKSD_TOKEN_CONTRACT);
-    }
-
     function setUSDCTokenContract(address _newAddress) external onlyOwner {
         USDC_TOKEN_CONTRACT = _newAddress;
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
@@ -403,11 +393,14 @@ contract BlockSendRouter is Ownable {
 
     // *********************** Get the latest rate *************************************
     function get_EUR_USD_LatestPrice() public view returns (uint256) {
-        (, int256 price, , , ) = AggregatorV3Interface(EUR_USD_AGGREGATOR).latestRoundData();
+        (, int256 price, , , ) = AggregatorV3Interface(EUR_USD_AGGREGATOR)
+            .latestRoundData();
         return uint256(price / 1000);
     }
+
     function get_USDC_USD_LatestPrice() public view returns (uint256) {
-        (, int256 price, , , ) = AggregatorV3Interface(USDC_USD_AGGREGATOR).latestRoundData();
+        (, int256 price, , , ) = AggregatorV3Interface(USDC_USD_AGGREGATOR)
+            .latestRoundData();
         return uint256(price / 1000);
     }
     // *********************************************************************************
