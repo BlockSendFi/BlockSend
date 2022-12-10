@@ -130,7 +130,10 @@ export class TransferService implements OnApplicationBootstrap {
     );
     try {
       const optionsTx: IOptionsTx = {
-        gasPrice: ethers.utils.parseUnits('40.0', 'gwei'),
+        gasPrice:
+          process.env.NODE_ENV === 'development'
+            ? ethers.utils.parseUnits('50.0', 'gwei')
+            : ethers.utils.parseUnits('210.0', 'gwei'),
         gasLimit: ethers.utils.parseUnits('0.008', 'gwei'),
       };
 
