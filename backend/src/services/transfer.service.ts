@@ -182,7 +182,7 @@ export class TransferService implements OnApplicationBootstrap {
     );
     const offchainProviderParams = {
       mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
-      amount: transfer.amountWithoutFees,
+      amount: transfer.amountWithoutFees / 1000000,
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,
       origin: {
