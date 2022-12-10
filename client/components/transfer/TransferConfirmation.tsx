@@ -3,7 +3,7 @@ import React, { FC, useContext, useState } from 'react';
 import ERC20 from '../../contracts/ERC20.json';
 import ITransfer from '../../interfaces/transfer.interface';
 import Button from '../common/Button';
-import { useAccount, useContractWrite, useQueryClient } from 'wagmi';
+import { useAccount, useContractWrite } from 'wagmi';
 import { utils } from 'ethers';
 import initTransferMutation from '../../api/init-transfer-mutation.api';
 import { AuthContext } from '../../contexts/auth.context';
@@ -17,10 +17,10 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
   const { address } = useAccount()
   const { accessToken } = useContext(AuthContext)
   const { closeModal } = useContext(LayoutContext)
-  const client = useQueryClient()
+  // const client = useQueryClient()
   const { isLoading, mutate } = useMutation(initTransferMutation, {
     onSuccess: () => {
-      client.invalidateQueries('myTransfers')
+      // client.invalidateQueries('myTransfers')
       toast.success('Votre transfert a bien été initié.')
       closeModal()
     }

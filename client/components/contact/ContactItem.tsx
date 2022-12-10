@@ -1,16 +1,7 @@
-import React, { FC, useContext, useState } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from 'react-query';
-import initTransferMutation from '../../api/init-transfer-mutation.api';
-import { AuthContext } from '../../contexts/auth.context';
+import React, { FC } from 'react';
 import IContact from '../../interfaces/contact.interface';
-import Button from '../common/Button';
-import ChevronDownIcon from '../common/icons/ChevronDownIcon';
 import ChevronRightIcon from '../common/icons/ChevronRightIcon';
-import Input from '../common/Input';
-import { useAccount, useContractWrite } from 'wagmi'
-import ERC20Contract from '../../contracts/ERC20.json';
-import { utils } from 'ethers';
+
 import PhoneNumber from '../common/PhoneNumber';
 
 const ContactItem: FC<{ contact: IContact, onClick: () => void }> = ({ contact, onClick }) => {

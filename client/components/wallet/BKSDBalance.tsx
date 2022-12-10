@@ -3,10 +3,7 @@ import { useBalance } from 'wagmi';
 import Loader from '../common/Loader';
 
 const BKSDBalance: FC<{ address: `0x${string}` }> = ({ address }) => {
-
-  console.log("🚀 ~ file: BKSDBalance.tsx:7 ~ address", address)
   return null
-  console.log('---', process.env.NEXT_PUBLIC_MONERIUM_EURE)
   const { data, isError, isLoading } = useBalance({
     address,
     token: process.env.NEXT_PUBLIC_MONERIUM_EURE as `0x${string}`,

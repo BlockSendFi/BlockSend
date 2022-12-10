@@ -5,7 +5,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import clsx from 'clsx'
 
 const Input: FC<{
-  label: string;
+  label?: string;
   name: string;
   type?: string;
   labelClass?: string;
