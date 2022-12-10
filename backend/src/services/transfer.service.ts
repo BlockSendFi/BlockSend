@@ -113,7 +113,9 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   async getMyTransfers(user) {
-    return this.transferModel.find({ user: user._id }).lean();
+    return this.transferModel
+      .find({ user: user._id }, null, { $sort: { createdAt: -1 } })
+      .lean();
   }
 
   private async startTransfer(transfer: Transfer) {

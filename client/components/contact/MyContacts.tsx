@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { FaPlus, FaPlusCircle } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import getMyContactsQuery from '../../api/get-my-contacts-query.api';
 import { AuthContext } from '../../contexts/auth.context';
@@ -20,7 +21,14 @@ const MyContacts = () => {
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{"Mes contacts"}</h2>
-        <Button title="Ajouter un contact" onClick={addContact} />
+        <Button onClick={addContact} className="flex items-center gap-2">
+          <>
+            <FaPlusCircle />
+            <span>
+              {"Ajouter un contact"}
+            </span>
+          </>
+        </Button>
       </div>
 
       {

@@ -40,6 +40,7 @@ const SignupForm: FC = () => {
           placeholder="Votre email" />
         <Input
           type="password"
+          labelClass='text-white'
           label="Mot de passe" register={register} name="password" errors={errors} rules={{
             required: 'Ce champ est obligatoire', pattern: {
               value: validationRegex.PASSWORD_REGEX,

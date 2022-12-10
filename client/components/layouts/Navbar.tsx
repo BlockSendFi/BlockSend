@@ -32,7 +32,7 @@ const Navbar: FC<{ variant?: boolean }> = ({ variant = false }) => {
   const Logo = accessToken ? LogoTextBlue : LogoText
 
   return (
-    <div className="h-[80px] px-8 flex items-center justify-between">
+    <div className="h-[80px] px-8 flex items-center justify-between w-full">
       <Image src={Logo} alt={"BlockSend: Worldwide Remittance"} onClick={onClick} className="cursor-pointer" width={160} />
 
       <div className="flex items-center gap-8">

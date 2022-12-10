@@ -3,14 +3,15 @@ import React, { FC } from 'react';
 import LoadingIcon from './icons/LoadingIcon';
 
 const Button: FC<{
-  title: string;
   type?: 'button' | 'submit' | 'reset',
   className?: string;
   loading?: boolean;
   onClick?: () => void;
   color?: string;
   textColor?: string;
-}> = ({ title, type = "button", className = "", loading = false, onClick, color = 'green-main', textColor = 'white' }) => {
+  children?: JSX.Element;
+  title?: string;
+}> = ({ type = "button", className = "", loading = false, onClick, color = 'green-main', textColor = 'white', children, title }) => {
 
   const buttonProps = {
     disabled: loading,
@@ -27,7 +28,7 @@ const Button: FC<{
       {
         loading && (<LoadingIcon />)
       }
-      {title}
+      {children ? children : title}
     </button>
   );
 };
