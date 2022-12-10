@@ -169,6 +169,9 @@ export class TransferService implements OnApplicationBootstrap {
 
   private async notifyOffchainProvider(transfer) {
     console.log(
+      '🚀 ~ file: transfer.service.ts:171 ~ TransferService ~ notifyOffchainProvider ~ notifyOffchainProvider',
+    );
+    console.log(
       '🚀 ~ file: transfer.service.ts:190 ~ TransferService ~ notifyOffchainProvider ~ transfer',
       transfer,
     );
@@ -189,7 +192,7 @@ export class TransferService implements OnApplicationBootstrap {
       },
     };
 
-    this.logger.log(
+    this.logger.debug(
       `Notify offchain provider with ${JSON.stringify(offchainProviderParams)}`,
     );
 
@@ -219,7 +222,7 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   async setTransferOnChainCompleted(transferId, amountWithoutFees) {
-    const transfer = await this.transferModel.findById(transferId);
+    const transfer = await this.transferModel.findById(transferId).lean();
     console.log(
       '🚀 ~ file: transfer.service.ts:242 ~ TransferService ~ setTransferOnChainCompleted ~ transfer',
       transfer,
@@ -314,7 +317,7 @@ export class TransferService implements OnApplicationBootstrap {
       offchainProviderTransferEvent.type === 'api.failed' ||
       offchainProviderTransferEvent.type === 'wrapper.check.failed'
     ) {
-      this.logger.log(
+      this.logger.error(
         `Transfer ${transfer._id} failed ! Reason : ${offchainProviderTransferEvent.type}`,
       );
       await this.transferModel
