@@ -254,7 +254,7 @@ export class TransferService implements OnApplicationBootstrap {
       transfer.userWalletAddress,
     );
 
-    const balanceInt = parseInt(ethers.utils.formatEther(balance));
+    const balanceInt = parseFloat(ethers.utils.formatEther(balance));
     this.logger.log(
       `[CRON] User wallet ${transfer.userWalletAddress} has a balance of ${balanceInt} EURe / ${transfer.amount} EURe`,
     );
