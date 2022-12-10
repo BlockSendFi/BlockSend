@@ -28,10 +28,10 @@ const IndexPage = () => {
 
   return (
     <Layout heroContent={
-      <div className="grid grid-cols-5 gap-6">
-        <div className="flex col-span-3">
+      <div className="grid grid-cols-5 gap-6 relative bottom-12">
+        <div className="flex col-span-3 pt-16">
 
-          <div className="text-5xl text-white font-bold" style={{ lineHeight: 1.5 }}>
+          <div className="text-4xl text-white font-bold pr-12" style={{ lineHeight: 1.8 }}>
             <span>
 
               {"Transférer de l’argent à l’étranger n’a jamais été aussi "}
@@ -48,13 +48,13 @@ const IndexPage = () => {
           </div>
         </div>
 
-        <div className="px-6 pt-12 pb-6 bg-gray-200 rounded-xl flex flex-col col-span-2 gap-8">
+        <div className="px-6 pt-6 pb-4 bg-gray-200 rounded-xl flex flex-col col-span-2 gap-8 relative right-12">
 
 
           <div className="flex flex-col gap-6">
 
             <div className="flex flex-col gap-2">
-              <div className="text-sm">
+              <div className="text-sm text-gray-600">
                 {"Vous envoyé"}
               </div>
 
@@ -70,7 +70,7 @@ const IndexPage = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="text-sm">
+              <div className="text-sm text-gray-600">
                 {"Votre destinataire reçoit"}
               </div>
 
@@ -94,7 +94,7 @@ const IndexPage = () => {
             <Button title="Comparer les prix" color='transparent' className="border border-blue-main text-blue-main w-full text-center" />
           </div>
 
-          <div className="text-center opacity-60 flex gap-2 justify-center">
+          <div className="text-center opacity-60 flex gap-2 justify-center text-sm">
             <span>
               {'Voir les détails'}
             </span>

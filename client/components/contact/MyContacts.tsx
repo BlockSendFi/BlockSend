@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { FaPlus, FaPlusCircle } from 'react-icons/fa';
+import { FaPlusCircle } from 'react-icons/fa';
 import { useQuery } from 'react-query';
 import getMyContactsQuery from '../../api/get-my-contacts-query.api';
 import { AuthContext } from '../../contexts/auth.context';
