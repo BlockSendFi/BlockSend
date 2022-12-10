@@ -1,8 +1,8 @@
-import { IsEthereumAddress, IsMongoId, IsNumber, Min } from 'class-validator';
+import { IsEthereumAddress, IsNumber, Min } from 'class-validator';
+import { Recipient } from 'src/schemas/transfer.schema';
 
 export class InitTransferInput {
-  @IsMongoId()
-  public contact: string;
+  public recipient: Recipient;
 
   @IsNumber()
   @Min(0.5)

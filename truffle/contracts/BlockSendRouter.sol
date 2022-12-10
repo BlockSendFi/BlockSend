@@ -169,6 +169,14 @@ contract BlockSendRouter is Ownable {
         return true;
     }
 
+    function getMyTranferRewardsBalance()
+        external
+        view
+        returns (uint256)
+    {
+        return transferRewardsBalance[msg.sender];
+    }
+
     function claimTransferRewards() external {
         // TODO: Add a require if necessary to avoid claim small amount of BSKD
         uint256 amount = transferRewardsBalance[msg.sender];
