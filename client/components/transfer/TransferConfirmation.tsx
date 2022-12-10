@@ -28,7 +28,7 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
 
   const approveEUReRequest = useContractWrite({
     mode: "recklesslyUnprepared",
-    address: process.env.NEXT_PUBLIC_MONERIUM_EURE_CONTRACT,
+    address: process.env.NEXT_PUBLIC_MONERIUM_EURE,
     abi: ERC20.abi,
     functionName: 'approve',
   })

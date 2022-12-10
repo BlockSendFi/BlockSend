@@ -21,7 +21,7 @@ const ContactItem: FC<{ contact: IContact, onClick: () => void }> = ({ contact, 
 
   // const approveEUReRequest = useContractWrite({
   //   mode: "recklesslyUnprepared",
-  //   address: process.env.NEXT_PUBLIC_MONERIUM_EURE_CONTRACT,
+  //   address: process.env.NEXT_PUBLIC_MONERIUM_EURE,
   //   abi: ERC20Contract.abi,
   //   functionName: 'approve',
   // })

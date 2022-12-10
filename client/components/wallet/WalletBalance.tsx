@@ -1,15 +1,11 @@
 import React from 'react';
-import { useBalance } from 'wagmi';
+import { useAccount } from 'wagmi';
 import Button from '../common/Button';
-import Loader from '../common/Loader';
+import BKSDBalance from './BKSDBalance';
+import ClaimBKSD from './ClaimBKSD';
 
 const WalletBalance = () => {
-  const { data, isError, isLoading } = useBalance({
-    address: process.env.NEXT_PUBLIC_BKSD_TOKEN as `0x${string}`,
-  })
-
-  if (isLoading) return <Loader />
-  if (isError) return <div>{"Error fetching balance"}</div>
+  const { address } = useAccount()
 
   return (
     <div className="px-4 py-6 border rounded-2xl  border-gray-200 w-[260px] self-start">
@@ -18,20 +14,11 @@ const WalletBalance = () => {
       <hr className="my-2" />
       <div className="mt-2 flex flex-col gap-6 justify-center">
         <div className="flex flex-col gap-2">
-          <div className="text-2xl gap-2 flex items-center py-2 justify-center">
-
-            <div className="text-3xl font-semibold">
-              {"10200"}
-              {data?.formatted}
-            </div>
-
-            <div className="font-bold text-sm">
-              {"BKSD"}
-              {data?.symbol}
-            </div>
-          </div>
+          <BKSDBalance address={address as `0x${string}`} />
 
           <Button title="Acheter du BKSD" color="blue-light" />
+
+          <ClaimBKSD />
         </div>
 
         <div className="flex flex-col gap-1">
