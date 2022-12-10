@@ -133,7 +133,7 @@ export class TransferService implements OnApplicationBootstrap {
         gasPrice:
           process.env.NODE_ENV === 'development'
             ? ethers.utils.parseUnits('50.0', 'gwei')
-            : ethers.utils.parseUnits('210.0', 'gwei'),
+            : ethers.utils.parseUnits('80.0', 'gwei'),
         gasLimit: ethers.utils.parseUnits('0.008', 'gwei'),
       };
 
