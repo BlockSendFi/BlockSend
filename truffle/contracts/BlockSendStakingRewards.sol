@@ -48,7 +48,7 @@ contract BlockSendStakingRewards is Ownable {
 
     function unStake(uint256 _amount) external {
         require(
-            block.timestamp > endDate || block.timestamp < startDate,
+            block.timestamp > endDate,
             "unstacking impossible!"
         );
         require(_amount > 0, "amount not valid!");
@@ -59,9 +59,7 @@ contract BlockSendStakingRewards is Ownable {
 
         BKSDToken.transfer(msg.sender, _amount);
         userTokensStaked[msg.sender] -= _amount;
-        if (block.timestamp > endDate) {
-            totalStaked -= _amount;
-        }
+        totalStaked -= _amount;
 
         emit UnStaked(msg.sender, _amount);
     }
@@ -70,8 +68,7 @@ contract BlockSendStakingRewards is Ownable {
         require(block.timestamp > endDate, "withdraw impossible!");
         require(userTokensStaked[msg.sender] > 0, "no staked tokens");
 
-        uint256 reward = (totalRewards / totalStaked) *
-            userTokensStaked[msg.sender];
+        uint256 reward = (totalRewards / totalStaked) * userTokensStaked[msg.sender];
         require(reward > 0, "no rewards earned yet");
 
         USDCToken.transfer(msg.sender, reward);
