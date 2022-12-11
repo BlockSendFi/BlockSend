@@ -63,11 +63,11 @@ contract BlockSendStakingRewards is Ownable {
         userTokensStaked[msg.sender] = 0;
     }
 
-    function getMyStakedTokens() public view returns (uint256) {
+    function getMyStakedTokens() external view returns (uint256) {
         return userTokensStaked[msg.sender];
     }
 
-    function getMyUSDCRewards() public view returns (uint256) {
+    function getMyUSDCRewards() external view returns (uint256) {
         return (userTokensStaked[msg.sender] / totalStaked) * totalRewards;
     }
 
