@@ -24,6 +24,7 @@ contract BlockSendStakingRewards is Ownable {
 
     mapping(address => uint256) public userTokensStaked;
     mapping(uint256 => uint256) public rewards;
+    mapping(address => bool) public rewardsAlreadyClaimed;
 
     constructor(
         address _blocksSendTokenAdress,
@@ -46,15 +47,33 @@ contract BlockSendStakingRewards is Ownable {
         emit Staked(msg.sender, _amount);
     }
 
-    function claimAndUnstake() external {
-        require(block.timestamp > endDate, "unstacking impossible!");
-        require(userTokensStaked[msg.sender] > 0, "no staked tokens");
+    function claimRewards() external {
+        require(block.timestamp > endDate, "Too soon to claim rewards!");
+        require(
+            rewardsAlreadyClaimed[msg.sender] == false,
+            "Already claimed rewards!"
+        );
 
         //  We calculate the rewards and send them to the user
         uint256 USDCRewards = (userTokensStaked[msg.sender] / totalStaked) *
             totalRewards;
         USDCToken.transfer(msg.sender, USDCRewards);
         emit WithdrawRewards(msg.sender, USDCRewards);
+        rewardsAlreadyClaimed[msg.sender] = true;
+    }
+
+    function unstake() external {
+        require(block.timestamp > endDate, "Too soon to unstake!");
+        require(userTokensStaked[msg.sender] > 0, "No staked tokens");
+
+        if (rewardsAlreadyClaimed[msg.sender] == false) {
+            //  We calculate the rewards and send them to the user
+            uint256 USDCRewards = (userTokensStaked[msg.sender] / totalStaked) *
+                totalRewards;
+            USDCToken.transfer(msg.sender, USDCRewards);
+            emit WithdrawRewards(msg.sender, USDCRewards);
+            rewardsAlreadyClaimed[msg.sender] = true;
+        }
 
         //  We send the staked tokens back to the user
         totalStaked -= userTokensStaked[msg.sender];
