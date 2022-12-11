@@ -9,6 +9,8 @@ import ITransfer from '../../interfaces/transfer.interface';
 import { FaCheckCircle, FaQuestionCircle, FaTimesCircle } from 'react-icons/fa';
 import { TransferStatus } from '../../enums/transfer-status.enum';
 import LoadingIcon from '../common/icons/LoadingIcon';
+import Button from '../common/Button';
+import { LayoutContext } from '../../contexts/layout.context';
 
 interface Props {
   transferId: string
@@ -16,6 +18,7 @@ interface Props {
 
 const TransferDetailsModal: FC<Props> = ({ transferId }) => {
   const { accessToken } = useContext(AuthContext)
+  const { closeModal } = useContext(LayoutContext)
 
   const { data, isLoading, isError } = useQuery(
     ["transfer", transferId],
@@ -32,16 +35,43 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
     <>
       <Dialog.Title className="text-center text-xl uppercase font-bold">{`Détails du transfert`}</Dialog.Title>
 
-      <div className="flex flex-col gap-4 mt-4">
+      {transfer.status === TransferStatus.PENDING ? (<div className="mt-2 w-[300px] flex flex-col gap-4">
+
+        <div className="mt-2 text-gray-600">
+          {"Pour initialiser votre transfert, veuillez faire un virement SEPA avec les informations suivantes :"}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
+            <div className="font-semibold text-sm">{"IBAN"}</div>
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="FR82 2323 3498 3843" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="font-semibold text-sm">{"BIC"}</div>
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="BBK BANQUE FR" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="font-semibold text-sm">{"Montant"}</div>
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value={transfer.amount.toFixed(2)} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="font-semibold text-sm">{"Code de suivi (obligatoire)"}</div>
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="HE2OKAA3" />
+          </div>
+        </div>
+
+        <Button onClick={closeModal} className="w-full" title={"Fermer"} />
+
+      </div>) : <div className="flex flex-col gap-4 mt-4">
         <TransferResume transfer={transfer} />
 
         <hr />
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
-            <div className="text-sm">{"Réception des EURe"}</div>
+            <div className="text-sm">{"Réception des fonds"}</div>
 
             {
-              transfer.status !== TransferStatus.PENDING ? <FaCheckCircle className="text-green-main" /> : <FaQuestionCircle className="text-gray-400" />
+              transfer.status as TransferStatus !== TransferStatus.PENDING ? <FaCheckCircle className="text-green-main" /> : <FaQuestionCircle className="text-gray-400" />
             }
           </div>
 
@@ -105,7 +135,7 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
             )
           }
         </div>
-      </div>
+      </div>}
     </>
   );
 };

@@ -17,7 +17,7 @@ const TransferResume: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }) => {
           {"Montant : "}
         </span>
         <span>
-          {`${transfer.amount} €`}
+          {`${(transfer.amount)?.toFixed(2)} €`}
         </span>
       </div>
     </>
