@@ -24,13 +24,6 @@ const XOF_RATE = 655.957 // fixed rate defined the bank of france
 
 const IndexPage = () => {
   const [value, setValue] = useState(1000)
-  const blockSendFees = 1.9
-  const otherActorsFees = 6
-  const xofValue = Math.ceil(value * XOF_RATE * (100 - blockSendFees)) / 100
-  const xofValueOtherActors = Math.ceil(value * XOF_RATE * (100 - blockSendFees - otherActorsFees)) / 100
-  const router = useRouter()
-  const onSend = () => router.push('/login')
-
   const { isLoading, data } = useContractRead({
     address: process.env.NEXT_PUBLIC_BLOCKSEND_ROUTER_ADDRESS,
     abi: BlockSendRouter.abi,
@@ -39,11 +32,20 @@ const IndexPage = () => {
   })
   const USDCRate = isLoading ? 1 : (data as BigNumber).toNumber() / 100000
   const conversionRate = Math.round((1 - USDCRate) * 10000) / 100
+  const conversionPrice = (conversionRate) * value / 100
+
+  const blockSendFees = 1.9
+  const otherActorsFees = 6
+
+  const xofValue = Math.ceil(((value) * XOF_RATE * (100 - blockSendFees) / 100))
+  const xofValueOtherActors = Math.ceil((value * XOF_RATE * (100 - blockSendFees - otherActorsFees) / 100))
+  const router = useRouter()
+  const onSend = () => router.push('/login')
 
   return (
     <Layout heroContent={
       <div className="grid grid-cols-5 gap-6 relative bottom-12">
-        <div className="flex col-span-3 pt-16">
+        <div className="flex col-span-3 pt-20">
 
           <div className="text-4xl text-white font-bold pr-12" style={{ lineHeight: 1.8 }}>
             <span>
@@ -97,7 +99,7 @@ const IndexPage = () => {
                   <div className="flex justify-between">
                     <div>{`Frais de conversion (${conversionRate}%)`}</div>
                     <div>
-                      {`${(conversionRate) * value / 100} EUR`}
+                      {`${conversionPrice} EUR`}
                     </div>
                   </div>
                 )
@@ -126,7 +128,7 @@ const IndexPage = () => {
             <div className="flex gap-2 flex-col">
 
               <div className="flex flex-col gap-2">
-                <div>{`Économie par rapport aux acteurs traditionnels (~6%) :`}</div>
+                <div className="text-sm">{`Économie par rapport aux acteurs traditionnels (~6%) :`}</div>
                 <div className="font-semibold">
                   {`${Math.round(xofValue - xofValueOtherActors)} XOF`}
                 </div>

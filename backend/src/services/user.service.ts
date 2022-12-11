@@ -16,10 +16,6 @@ export class UserService {
   }
 
   async getUser(userId): Promise<User | undefined> {
-    console.log(
-      '🚀 ~ file: user.service.ts:19 ~ UserService ~ getUser ~ userId',
-      userId,
-    );
     return this.userModel.findById(userId).lean();
   }
 }

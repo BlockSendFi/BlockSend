@@ -7,7 +7,7 @@ import InnerBlock from './InnerBlock';
 const Hero: FC<{ children?: JSX.Element, variant?: boolean }> = ({ children, variant = false }) => {
   return (
     <div
-      className={clsx({ "min-h-[598px]": !variant, "minh-[80px]": variant })}
+      className={clsx({ "min-h-[640px]": !variant, "minh-[80px]": variant })}
       style={variant ? {} : {
         backgroundImage: `url(${heroBg.src})`,
         backgroundSize: 'cover',
