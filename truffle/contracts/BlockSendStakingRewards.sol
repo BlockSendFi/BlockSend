@@ -63,7 +63,7 @@ contract BlockSendStakingRewards is Ownable {
 
         // If the user has already lock some tokens, we choose the longest duration
         if (_additionalDuration > userAdditionalLock[msg.sender]) {
-            userPowerStaked[msg.sender] += _additionalDuration;
+            userPowerStaked[msg.sender] = _additionalDuration;
         }
 
         userAdditionalLock[msg.sender] = _additionalDuration;
