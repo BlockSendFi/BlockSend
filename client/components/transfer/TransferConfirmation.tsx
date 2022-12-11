@@ -51,7 +51,6 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
       return toast.warn(`Vous devez permettre à BlockSend d'utiliser vos tokens EURe`)
     }
     setApproveEUReLoading(false)
-    console.log('Mutate!!!')
     mutate({
       initTransferInput: {
         amount: transfer.amount as number,
