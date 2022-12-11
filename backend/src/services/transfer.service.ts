@@ -11,7 +11,7 @@ import { ContactService } from './contact.service';
 import * as _ from 'underscore';
 import { TransferStatus } from 'src/enums/transfer-status.enum';
 import axios from 'axios';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 import ERC20 from '../../contracts/ERC20.json';
 import BlockSendRouter from '../../contracts/BlockSendRouter.json';
 import { UserService } from './user.service';
@@ -102,7 +102,7 @@ export class TransferService implements OnApplicationBootstrap {
   async initTransfer(initTransferInput, user) {
     const transfer = await new this.transferModel({
       user: user._id,
-      userWalletAddress: `0x${initTransferInput.walletAddress}`,
+      userWalletAddress: initTransferInput.walletAddress,
       amount: initTransferInput.amount,
       recipient: initTransferInput.recipient,
     }).save();
@@ -145,7 +145,7 @@ export class TransferService implements OnApplicationBootstrap {
 
       const tx = await this.BlockSendContract.initializeTransfer(
         transfer._id.toString(),
-        transfer.userWalletAddress,
+        utils.getAddress(transfer.userWalletAddress),
         amountDecimals,
         optionsTx,
       );
@@ -158,8 +158,8 @@ export class TransferService implements OnApplicationBootstrap {
         amountDecimals,
       );
       console.log(
-        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.userWalletAddress',
-        transfer.userWalletAddress,
+        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.utils.getAddress(transfer.userWalletAddress),',
+        utils.getAddress(transfer.userWalletAddress),
       );
       console.log(
         '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.userWalletAddress',
