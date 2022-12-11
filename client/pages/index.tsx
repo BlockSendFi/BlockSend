@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Button from '../components/common/Button';
 import HomeSection from '../components/home/HomeSection';
+import BlockSendRouter from '../contracts/BlockSendRouter.json'
 import Layout from '../components/layouts/Layout';
 import { FaChevronDown } from 'react-icons/fa'
 import { useRouter } from 'next/router';
+import { useContractRead } from 'wagmi';
+import { BigNumber } from 'ethers';
 
 const HOME_SECTIONS = [
   {
@@ -17,14 +20,25 @@ const HOME_SECTIONS = [
   }
 ]
 
-const XOF_RATE = 658.21
+const XOF_RATE = 655.957 // fixed rate defined the bank of france
 
 const IndexPage = () => {
   const [value, setValue] = useState(1000)
   const blockSendFees = 1.9
+  const otherActorsFees = 6
   const xofValue = Math.ceil(value * XOF_RATE * (100 - blockSendFees)) / 100
+  const xofValueOtherActors = Math.ceil(value * XOF_RATE * (100 - blockSendFees - otherActorsFees)) / 100
   const router = useRouter()
   const onSend = () => router.push('/login')
+
+  const { isLoading, data } = useContractRead({
+    address: process.env.NEXT_PUBLIC_BLOCKSEND_ROUTER_ADDRESS,
+    abi: BlockSendRouter.abi,
+    functionName: 'get_USDC_USD_LatestPrice',
+    chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
+  })
+  const USDCRate = isLoading ? 1 : (data as BigNumber).toNumber() / 100000
+  const conversionRate = Math.round((1 - USDCRate) * 10000) / 100
 
   return (
     <Layout heroContent={
@@ -69,6 +83,28 @@ const IndexPage = () => {
               </div>
             </div>
 
+            <div className="flex gap-2 flex-col">
+
+              <div className="flex justify-between">
+                <div>{`Frais de service (${blockSendFees}%)`}</div>
+                <div>
+                  {`${blockSendFees * value / 100} EUR`}
+                </div>
+              </div>
+
+              {
+                USDCRate < 0.995 && (
+                  <div className="flex justify-between">
+                    <div>{`Frais de conversion (${conversionRate}%)`}</div>
+                    <div>
+                      {`${(conversionRate) * value / 100} EUR`}
+                    </div>
+                  </div>
+                )
+              }
+
+            </div>
+
             <div className="flex flex-col gap-2">
               <div className="text-sm text-gray-600">
                 {"Votre destinataire reçoit"}
@@ -85,6 +121,16 @@ const IndexPage = () => {
                 </div>
               </div>
 
+            </div>
+
+            <div className="flex gap-2 flex-col">
+
+              <div className="flex flex-col gap-2">
+                <div>{`Économie par rapport aux acteurs traditionnels (~6%) :`}</div>
+                <div className="font-semibold">
+                  {`${Math.round(xofValue - xofValueOtherActors)} XOF`}
+                </div>
+              </div>
             </div>
 
           </div>
