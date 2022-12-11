@@ -42,8 +42,17 @@ export class Transfer {
   @Prop()
   offchainTransferTx?: string;
 
-  // @Prop()
-  // tx?: string;
+  @Prop({ default: false })
+  routingOnChainStarted?: boolean;
+
+  @Prop({ default: false })
+  routingOnChainCompleted?: boolean;
+
+  @Prop({ default: false })
+  offchainTransferStarted?: boolean;
+
+  @Prop({ default: false })
+  offchainTransferCompleted?: boolean;
 
   @Prop()
   user: Types.ObjectId;

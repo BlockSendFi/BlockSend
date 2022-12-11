@@ -10,8 +10,6 @@ const NewTransferModal: FC = () => {
   const [transfer, setTransfer] = useState<Partial<ITransfer>>({})
   const [step, setStep] = useState(0)
 
-
-
   const NEW_TRANSFER_STEPS = [
     {
       title: 'Destinataire du transfert',

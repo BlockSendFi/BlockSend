@@ -13,7 +13,6 @@ const ClaimBKSD = () => {
     functionName: 'getMyTranferRewardsBalance',
     chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
   })
-  console.log("🚀 ~ file: ClaimBKSD.tsx:16 ~ ClaimBKSD ~ data", data)
 
   if (isLoading) return <Loader />
   if (isError) return <div>{"Une erreur s'est produite"}</div>
@@ -40,7 +39,7 @@ const ClaimBKSD = () => {
                 {"BKSD"}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center w-full">
               <Button title={"Récupérer maintenant 🔥"} />
             </div>
           </div>
@@ -58,7 +57,7 @@ const ClaimBKSD = () => {
                 {"USDC"}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center w-full">
               <Button title={"Récupérer maintenant 🤩"} />
             </div>
           </div>

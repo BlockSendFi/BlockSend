@@ -12,7 +12,9 @@ import TransferItem from './TransferItem';
 
 const MyTransfers = () => {
   const { accessToken } = useContext(AuthContext)
-  const { data, isLoading, isError, error } = useQuery("myTransfers", () => getMyTransfersQuery(accessToken as string))
+  const { data, isLoading, isError, error } = useQuery("myTransfers", () => getMyTransfersQuery(accessToken as string), {
+    refetchInterval: 2000
+  })
   const transfers = data?.data || []
   const { openModal } = useContext(LayoutContext)
 

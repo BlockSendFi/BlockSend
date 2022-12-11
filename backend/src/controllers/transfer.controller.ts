@@ -5,6 +5,7 @@ import { User } from 'src/schemas/user.schema';
 import { InitTransferInput } from 'src/inputs/init-transfer.input';
 import { TransferService } from 'src/services/transfer.service';
 import { OffchainProviderEventInput } from 'src/inputs/offchain-provider-event-input.input';
+import { OffchainProviderGuard } from 'src/auth/offchain-provider-auth.guard';
 
 @Controller('transfers')
 export class TransferController {
@@ -15,6 +16,20 @@ export class TransferController {
   async getMyTransfers(@CurrentUser() user: User) {
     const transfers = await this.transferService.getMyTransfers(user);
     return transfers;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:transferId')
+  async getTransfer(
+    @CurrentUser() user: User,
+    @Param('transferId') transferId: string,
+  ) {
+    const transfer = await this.transferService.getTransfer(transferId);
+
+    if (transfer.user.toString() !== user._id.toString()) {
+      throw new Error('Unauthorized');
+    }
+    return transfer;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -30,6 +45,7 @@ export class TransferController {
     return transfer;
   }
 
+  @UseGuards(OffchainProviderGuard)
   @Post('/notify')
   async offchainProviderTransferEvent(
     @Body() offchainProviderEventInput: OffchainProviderEventInput,
