@@ -42,6 +42,9 @@ export class Transfer {
   @Prop()
   offchainTransferTx?: string;
 
+  @Prop()
+  identifier?: string;
+
   @Prop({ default: false })
   routingOnChainStarted?: boolean;
 

@@ -61,24 +61,29 @@ export class TransferService implements OnApplicationBootstrap {
     );
   }
 
-  private async onTransferInitialized(transferId, amount) {
-    this.logger.log(`Transfer ${transferId} with amount ${amount} initialized`);
+  private async onTransferInitialized(transferIdentifier, amount) {
+    this.logger.log(
+      `Transfer ${transferIdentifier} with amount ${amount} initialized`,
+    );
 
     await this.transferModel
-      .findByIdAndUpdate(transferId, {
-        $set: {
-          status: TransferStatus.STARTED,
+      .updateOne(
+        { identifier: transferIdentifier },
+        {
+          $set: {
+            status: TransferStatus.STARTED,
+          },
         },
-      })
+      )
       .exec();
   }
 
-  private onTransferFinalized(transferId, amountWithoutFees) {
+  private onTransferFinalized(transferIdentifier, amountWithoutFees) {
     this.logger.log(
-      `Transfer ${transferId} finalized (amountWithoutFees: ${amountWithoutFees})`,
+      `Transfer ${transferIdentifier} finalized (amountWithoutFees: ${amountWithoutFees})`,
     );
 
-    this.setTransferOnChainCompleted(transferId, amountWithoutFees);
+    this.setTransferOnChainCompleted(transferIdentifier, amountWithoutFees);
   }
 
   private listenEvents() {
@@ -100,7 +105,9 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   async initTransfer(initTransferInput, user) {
+    const transfersCount = await this.transferModel.countDocuments();
     const transfer = await new this.transferModel({
+      identifier: `t${transfersCount + 1}`,
       user: user._id,
       userWalletAddress: initTransferInput.walletAddress,
       amount: initTransferInput.amount,
@@ -144,26 +151,11 @@ export class TransferService implements OnApplicationBootstrap {
       };
 
       const tx = await this.BlockSendContract.initializeTransfer(
-        transfer._id.toString(),
-        utils.getAddress(transfer.userWalletAddress),
+        transfer.identifier,
+        transfer.userWalletAddress,
+        // utils.getAddress(transfer.userWalletAddress),
         amountDecimals,
         optionsTx,
-      );
-      console.log(
-        '🚀 ~ file: transfer.service.ts:148 ~ TransferService ~ startTransfer ~ transfer._id.toString()',
-        transfer._id.toString(),
-      );
-      console.log(
-        '🚀 ~ file: transfer.service.ts:178 ~ TransferService ~ startTransfer ~ amountDecimals',
-        amountDecimals,
-      );
-      console.log(
-        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.utils.getAddress(transfer.userWalletAddress),',
-        utils.getAddress(transfer.userWalletAddress),
-      );
-      console.log(
-        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.userWalletAddress',
-        transfer.userWalletAddress,
       );
 
       this.logger.log(tx);
@@ -240,29 +232,34 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  async setTransferOnChainCompleted(transferId, amountWithoutFees) {
-    const transfer = await this.transferModel.findById(transferId).lean();
+  async setTransferOnChainCompleted(transferIdentifier, amountWithoutFees) {
+    const transfer = await this.transferModel
+      .findOne({ identifier: transferIdentifier })
+      .lean();
     if (transfer.status === TransferStatus.OFFRAMP_COMPLETED) {
       return;
     }
 
     await this.transferModel
-      .findByIdAndUpdate(transferId, {
-        $set: {
-          amountWithoutFees: amountWithoutFees.toNumber(),
-          status: TransferStatus.ONCHAIN_TRANSFER_DONE,
-          routingOnChainCompleted: true,
+      .updateOne(
+        { identifier: transferIdentifier },
+        {
+          $set: {
+            amountWithoutFees: amountWithoutFees.toNumber(),
+            status: TransferStatus.ONCHAIN_TRANSFER_DONE,
+            routingOnChainCompleted: true,
+          },
         },
-      })
+      )
       .exec();
 
     const transferUpdated = await this.transferModel
-      .findById(transferId)
+      .findOne({ identifier: transferIdentifier })
       .lean();
 
     this.notifyOffchainProvider(transferUpdated);
 
-    return await this.transferModel.findById(transferId);
+    return await this.transferModel.findOne({ identifier: transferIdentifier });
   }
 
   private async checkBalanceAndStartTransfer(transfer: Transfer) {
