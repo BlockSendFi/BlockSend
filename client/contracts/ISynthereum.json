@@ -48,7 +48,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"numTokens\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minCollateral\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expiration\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"internalType\":\"struct ISynthereum.RedeemParams\",\"name\":\"_redeemParams\",\"type\":\"tuple\"}],\"name\":\"redeem\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"redeem((uint256,uint256,uint256,address))\":{\"params\":{\"_redeemParams\":\"Input parameters for redeeming (see RedeemParams struct)\"},\"returns\":{\"_0\":\"collateralRedeemed Amount of collateral redeeem by user\",\"_1\":\"feePaid Amount of collateral paid by user as fee\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"redeem((uint256,uint256,uint256,address))\":{\"notice\":\"Redeem amount of collateral using fixed number of synthetic tokenThis calculate the price using on chain price feedUser must approve synthetic token transfer for the redeem request to succeed\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/ISynthereum.sol\":\"ISynthereum\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/ISynthereum.sol\":{\"keccak256\":\"0xee15af6fc9df7d761058c68f36f3f0ee40cbf0be5ba57de60d24003ccfa46eb5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a7afc1b8a06423c7560ceac8891cb6edfd43297916d0b3c8b3c52bdde82e3043\",\"dweb:/ipfs/QmZ4ad8VSUArknoAnAniRrnpz7uvjYK3mexsBXP2saTFe7\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"numTokens\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minCollateral\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expiration\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"internalType\":\"struct ISynthereum.RedeemParams\",\"name\":\"_redeemParams\",\"type\":\"tuple\"}],\"name\":\"redeem\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"redeem((uint256,uint256,uint256,address))\":{\"params\":{\"_redeemParams\":\"Input parameters for redeeming (see RedeemParams struct)\"},\"returns\":{\"_0\":\"collateralRedeemed Amount of collateral redeeem by user\",\"_1\":\"feePaid Amount of collateral paid by user as fee\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"redeem((uint256,uint256,uint256,address))\":{\"notice\":\"Redeem amount of collateral using fixed number of synthetic tokenThis calculate the price using on chain price feedUser must approve synthetic token transfer for the redeem request to succeed\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/ISynthereum.sol\":\"ISynthereum\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/interfaces/ISynthereum.sol\":{\"keccak256\":\"0x7572fcc0d518a914113284e4fd394101e450c11556513851dcb96df8d9a95cf1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://75683a7fc33d27af87e1152ad8e882a7fd09651e5743dff11cb106444ae70788\",\"dweb:/ipfs/QmTxsx18LTQUFW9QezXjPqAK4HvXPGiCmjbUJwdcFSD1e2\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -56,21 +56,21 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.9;\n\ninterface ISynthereum {\n\n    struct RedeemParams {\n      // Amount of synthetic tokens that user wants to use for redeeming\n      uint256 numTokens;\n      // Minimium amount of collateral that user wants to redeem (anti-slippage)\n      uint256 minCollateral;\n      // Expiration time of the transaction\n      uint256 expiration;\n      // Address to which send collateral tokens redeemed\n      address recipient;\n    }\n\n    /**\n     * @notice Redeem amount of collateral using fixed number of synthetic token\n     * @notice This calculate the price using on chain price feed\n     * @notice User must approve synthetic token transfer for the redeem request to succeed\n     * @param _redeemParams Input parameters for redeeming (see RedeemParams struct)\n     * @return collateralRedeemed Amount of collateral redeeem by user\n     * @return feePaid Amount of collateral paid by user as fee\n     */\n    function redeem (RedeemParams memory _redeemParams ) external returns ( uint256, uint256 );\n}",
-  "sourcePath": "/Users/fabricepayet/Workspace/blocksend/blocksend/truffle/contracts/interfaces/ISynthereum.sol",
+  "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.9;\r\n\r\ninterface ISynthereum {\r\n\r\n    struct RedeemParams {\r\n      // Amount of synthetic tokens that user wants to use for redeeming\r\n      uint256 numTokens;\r\n      // Minimium amount of collateral that user wants to redeem (anti-slippage)\r\n      uint256 minCollateral;\r\n      // Expiration time of the transaction\r\n      uint256 expiration;\r\n      // Address to which send collateral tokens redeemed\r\n      address recipient;\r\n    }\r\n\r\n    /**\r\n     * @notice Redeem amount of collateral using fixed number of synthetic token\r\n     * @notice This calculate the price using on chain price feed\r\n     * @notice User must approve synthetic token transfer for the redeem request to succeed\r\n     * @param _redeemParams Input parameters for redeeming (see RedeemParams struct)\r\n     * @return collateralRedeemed Amount of collateral redeeem by user\r\n     * @return feePaid Amount of collateral paid by user as fee\r\n     */\r\n    function redeem (RedeemParams memory _redeemParams ) external returns ( uint256, uint256 );\r\n}",
+  "sourcePath": "C:\\Users\\zguai\\Desktop\\Repos\\BlockSend\\truffle\\contracts\\interfaces\\ISynthereum.sol",
   "ast": {
     "absolutePath": "project:/contracts/interfaces/ISynthereum.sol",
     "exportedSymbols": {
       "ISynthereum": [
-        1458
+        1484
       ]
     },
-    "id": 1459,
+    "id": 1485,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1437,
+        "id": 1463,
         "literals": [
           "solidity",
           "^",
@@ -78,7 +78,7 @@
           ".9"
         ],
         "nodeType": "PragmaDirective",
-        "src": "32:23:4"
+        "src": "33:23:4"
       },
       {
         "abstract": false,
@@ -87,27 +87,27 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 1458,
+        "id": 1484,
         "linearizedBaseContracts": [
-          1458
+          1484
         ],
         "name": "ISynthereum",
-        "nameLocation": "67:11:4",
+        "nameLocation": "70:11:4",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "canonicalName": "ISynthereum.RedeemParams",
-            "id": 1446,
+            "id": 1472,
             "members": [
               {
                 "constant": false,
-                "id": 1439,
+                "id": 1465,
                 "mutability": "mutable",
                 "name": "numTokens",
-                "nameLocation": "195:9:4",
+                "nameLocation": "202:9:4",
                 "nodeType": "VariableDeclaration",
-                "scope": 1446,
-                "src": "187:17:4",
+                "scope": 1472,
+                "src": "194:17:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -115,10 +115,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 1438,
+                  "id": 1464,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "187:7:4",
+                  "src": "194:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -128,13 +128,13 @@
               },
               {
                 "constant": false,
-                "id": 1441,
+                "id": 1467,
                 "mutability": "mutable",
                 "name": "minCollateral",
-                "nameLocation": "301:13:4",
+                "nameLocation": "310:13:4",
                 "nodeType": "VariableDeclaration",
-                "scope": 1446,
-                "src": "293:21:4",
+                "scope": 1472,
+                "src": "302:21:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -142,10 +142,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 1440,
+                  "id": 1466,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "293:7:4",
+                  "src": "302:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -155,13 +155,13 @@
               },
               {
                 "constant": false,
-                "id": 1443,
+                "id": 1469,
                 "mutability": "mutable",
                 "name": "expiration",
-                "nameLocation": "374:10:4",
+                "nameLocation": "385:10:4",
                 "nodeType": "VariableDeclaration",
-                "scope": 1446,
-                "src": "366:18:4",
+                "scope": 1472,
+                "src": "377:18:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -169,10 +169,10 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 1442,
+                  "id": 1468,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
-                  "src": "366:7:4",
+                  "src": "377:7:4",
                   "typeDescriptions": {
                     "typeIdentifier": "t_uint256",
                     "typeString": "uint256"
@@ -182,13 +182,13 @@
               },
               {
                 "constant": false,
-                "id": 1445,
+                "id": 1471,
                 "mutability": "mutable",
                 "name": "recipient",
-                "nameLocation": "458:9:4",
+                "nameLocation": "471:9:4",
                 "nodeType": "VariableDeclaration",
-                "scope": 1446,
-                "src": "450:17:4",
+                "scope": 1472,
+                "src": "463:17:4",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
@@ -196,10 +196,10 @@
                   "typeString": "address"
                 },
                 "typeName": {
-                  "id": 1444,
+                  "id": 1470,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
-                  "src": "450:7:4",
+                  "src": "463:7:4",
                   "stateMutability": "nonpayable",
                   "typeDescriptions": {
                     "typeIdentifier": "t_address",
@@ -210,81 +210,81 @@
               }
             ],
             "name": "RedeemParams",
-            "nameLocation": "93:12:4",
+            "nameLocation": "98:12:4",
             "nodeType": "StructDefinition",
-            "scope": 1458,
-            "src": "86:388:4",
+            "scope": 1484,
+            "src": "91:397:4",
             "visibility": "public"
           },
           {
             "documentation": {
-              "id": 1447,
+              "id": 1473,
               "nodeType": "StructuredDocumentation",
-              "src": "480:470:4",
+              "src": "496:477:4",
               "text": " @notice Redeem amount of collateral using fixed number of synthetic token\n @notice This calculate the price using on chain price feed\n @notice User must approve synthetic token transfer for the redeem request to succeed\n @param _redeemParams Input parameters for redeeming (see RedeemParams struct)\n @return collateralRedeemed Amount of collateral redeeem by user\n @return feePaid Amount of collateral paid by user as fee"
             },
             "functionSelector": "525e6b11",
-            "id": 1457,
+            "id": 1483,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "redeem",
-            "nameLocation": "964:6:4",
+            "nameLocation": "988:6:4",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1451,
+              "id": 1477,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1450,
+                  "id": 1476,
                   "mutability": "mutable",
                   "name": "_redeemParams",
-                  "nameLocation": "992:13:4",
+                  "nameLocation": "1016:13:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1457,
-                  "src": "972:33:4",
+                  "scope": 1483,
+                  "src": "996:33:4",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$_RedeemParams_$1446_memory_ptr",
+                    "typeIdentifier": "t_struct$_RedeemParams_$1472_memory_ptr",
                     "typeString": "struct ISynthereum.RedeemParams"
                   },
                   "typeName": {
-                    "id": 1449,
+                    "id": 1475,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 1448,
+                      "id": 1474,
                       "name": "RedeemParams",
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 1446,
-                      "src": "972:12:4"
+                      "referencedDeclaration": 1472,
+                      "src": "996:12:4"
                     },
-                    "referencedDeclaration": 1446,
-                    "src": "972:12:4",
+                    "referencedDeclaration": 1472,
+                    "src": "996:12:4",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_RedeemParams_$1446_storage_ptr",
+                      "typeIdentifier": "t_struct$_RedeemParams_$1472_storage_ptr",
                       "typeString": "struct ISynthereum.RedeemParams"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "971:36:4"
+              "src": "995:36:4"
             },
             "returnParameters": {
-              "id": 1456,
+              "id": 1482,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1453,
+                  "id": 1479,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1457,
-                  "src": "1027:7:4",
+                  "scope": 1483,
+                  "src": "1051:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -292,10 +292,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1452,
+                    "id": 1478,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1027:7:4",
+                    "src": "1051:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -305,13 +305,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 1455,
+                  "id": 1481,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1457,
-                  "src": "1036:7:4",
+                  "scope": 1483,
+                  "src": "1060:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -319,10 +319,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1454,
+                    "id": 1480,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1036:7:4",
+                    "src": "1060:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -331,21 +331,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1025:20:4"
+              "src": "1049:20:4"
             },
-            "scope": 1458,
-            "src": "955:91:4",
+            "scope": 1484,
+            "src": "979:91:4",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 1459,
-        "src": "57:991:4",
+        "scope": 1485,
+        "src": "60:1013:4",
         "usedErrors": []
       }
     ],
-    "src": "32:1016:4"
+    "src": "33:1040:4"
   },
   "compiler": {
     "name": "solc",
@@ -353,7 +353,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-12-10T18:08:04.620Z",
+  "updatedAt": "2022-12-11T13:53:02.966Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

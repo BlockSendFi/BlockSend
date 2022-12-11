@@ -15,7 +15,7 @@ contract BlockSendRouter is Ownable {
     IERC20 private jEURToken;
     IERC20 private USDCToken;
     BlockSendToken private BKSDToken;
-    mapping(address => uint256) private transferRewardsBalance;
+    mapping(address => uint256) public transferRewardsBalance;
 
     address private WRAPPER_CONTRACT =
         0xb07Cb016440331be4D2f532b20d892a420476AD0;
@@ -152,7 +152,7 @@ contract BlockSendRouter is Ownable {
             return false;
         }
 
-        transferRewardsBalance[userWallet] += amount / 2;
+        transferRewardsBalance[userWallet] += (amount / 2);
 
         finalizeTransfer(transferId);
 
@@ -167,17 +167,41 @@ contract BlockSendRouter is Ownable {
         // TODO: Add a require if necessary to avoid claim small amount of BSKD
         uint256 amount = transferRewardsBalance[msg.sender];
         transferRewardsBalance[msg.sender] = 0;
-        BKSDToken.mint(msg.sender, amount);
+        BKSDToken.mint(address(this), amount);
+        BKSDToken.transfer(msg.sender, amount);
         emit ClaimTransferRewardEvent(msg.sender, amount);
     }
 
     /**
      * Returns the current status of a specific remmitance.
      */
-    function remittanceStatus(
+    function getTransfer(
         string calldata _transferId
-    ) public view virtual returns (TransferStatus) {
-        return transfers[_transferId].status;
+    )
+        external
+        view
+        virtual
+        returns (
+            address sender,
+            uint256 amount_EURe,
+            uint256 amount_jEUR,
+            uint256 amount_USDC,
+            uint256 rate_EUR_USDC,
+            uint256 userAmount_USDC,
+            uint256 blocksendAmount_USDC,
+            uint256 jarvisFees_USDC,
+            TransferStatus status
+        )
+    {
+        sender = transfers[_transferId].sender;
+        amount_EURe = transfers[_transferId].amount_EURe;
+        amount_jEUR = transfers[_transferId].amount_jEUR;
+        amount_USDC = transfers[_transferId].amount_USDC;
+        rate_EUR_USDC = transfers[_transferId].rate_EUR_USDC;
+        userAmount_USDC = transfers[_transferId].userAmount_USDC;
+        blocksendAmount_USDC = transfers[_transferId].blocksendAmount_USDC;
+        jarvisFees_USDC = transfers[_transferId].jarvisFees_USDC;
+        status = transfers[_transferId].status;
     }
 
     // *********************** Manage Status changed ************************************
@@ -296,7 +320,7 @@ contract BlockSendRouter is Ownable {
             uint256 feePaid
         )
     {
-        uint256 price = 105400;
+        uint256 price = get_EUR_USD_LatestPrice();
         uint256 collateralUSDC = uint256((_numToken * price) / 10e18);
 
         okApprouveJEUR = jEURToken.approve(SYNTHEREUM_CONTRACT, _numToken);
@@ -345,7 +369,7 @@ contract BlockSendRouter is Ownable {
         uint256 _amount,
         uint256 _feePaid
     ) internal pure returns (uint256 blocksendAmount, uint256 userAmount) {
-        blocksendAmount = ((_amount * 19) / 1000) - _feePaid;
+        blocksendAmount = ((_amount * 14) / 1000) - _feePaid;
         userAmount = _amount - blocksendAmount;
     }
 
