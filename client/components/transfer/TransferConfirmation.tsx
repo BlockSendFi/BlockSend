@@ -9,20 +9,23 @@ import initTransferMutation from '../../api/init-transfer-mutation.api';
 import { AuthContext } from '../../contexts/auth.context';
 import { LayoutContext } from '../../contexts/layout.context';
 import { toast } from 'react-toastify';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import IRecipient from '../../interfaces/recipient.interface';
+import TransferResume from './TransferResume';
+import { ModalEnum } from '../../enums/modal.enum';
 
 const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }) => {
   const [approveEUReLoading, setApproveEUReLoading] = useState(false)
   const { address } = useAccount()
   const { accessToken } = useContext(AuthContext)
-  const { closeModal } = useContext(LayoutContext)
-  // const client = useQueryClient()
+  const { openModal } = useContext(LayoutContext)
+  const client = useQueryClient()
   const { isLoading, mutate } = useMutation(initTransferMutation, {
-    onSuccess: () => {
-      // client.invalidateQueries('myTransfers')
+    onSuccess: (data) => {
+      client.invalidateQueries('myTransfers')
       toast.success('Votre transfert a bien été initié.')
-      closeModal()
+      const transferId = data.data._id
+      openModal(ModalEnum.TRANSFER_DETAILS, { transferId })
     }
   })
 
@@ -37,10 +40,6 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
     // TODO: Get pending transfers transfer and compute the total amount
 
     setApproveEUReLoading(true)
-    // if (!approveEUReRequest.write) {
-    //   setApproveEUReLoading(false)
-    //   return toast.warn(`Vous devez permettre à BlockSend d'utiliser vos tokens EURe`)
-    // }
     const decimalAmount = utils.parseUnits((transfer.amount as number).toString(), 18)
 
     try {
@@ -64,25 +63,10 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
 
   return (
     <div>
-      <div>
-        <span>
-          {"Destinataire : "}
-        </span>
-        <span>
-          {transfer.recipient?.firstName} {transfer.recipient?.lastName}
-        </span>
-      </div>
-      <div>
-        <span>
-          {"Montant : "}
-        </span>
-        <span>
-          {`${transfer.amount} €`}
-        </span>
-      </div>
+      <TransferResume transfer={transfer} />
 
       <div className="mt-4">
-        <Button title={"Confirmer le transfert"} onClick={approveEUReForTransfer} loading={isLoading || approveEUReLoading} />
+        <Button title={"Confirmer le transfert"} onClick={approveEUReForTransfer} loading={isLoading || approveEUReLoading} className="w-full" />
       </div>
     </div>
   );

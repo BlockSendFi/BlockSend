@@ -18,6 +18,20 @@ export class TransferController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/:transferId')
+  async getTransfer(
+    @CurrentUser() user: User,
+    @Param('transferId') transferId: string,
+  ) {
+    const transfer = await this.transferService.getTransfer(transferId);
+
+    if (transfer.user.toString() !== user._id.toString()) {
+      throw new Error('Unauthorized');
+    }
+    return transfer;
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('/')
   async initTransfer(
     @Body() initTransferInput: InitTransferInput,
