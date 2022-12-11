@@ -38,7 +38,7 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
         <hr />
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
-            <div className="text-sm">{"En attente de virement"}</div>
+            <div className="text-sm">{"Réception des EURe"}</div>
 
             {
               transfer.status !== TransferStatus.PENDING ? <FaCheckCircle className="text-green-main" /> : <FaQuestionCircle className="text-gray-400" />
@@ -46,7 +46,7 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
           </div>
 
           <div className="flex justify-between">
-            <div className="text-sm">{"Début routage onchain"}</div>
+            <div className="text-sm">{"Initialisation routage onchain"}</div>
 
             {
               transfer.routingOnChainStarted ? <FaCheckCircle className="text-green-main" /> : <FaQuestionCircle className="text-gray-400" />

@@ -281,7 +281,6 @@ export class TransferService implements OnApplicationBootstrap {
 
   async handleOffchainProviderTransferEvent(offchainProviderTransferEvent) {
     /*
-      Possible events 
       WRAPPER_RECEIVED = 'wrapper.received',
       WRAPPER_CHECKING = 'wrapper.checking',
       WRAPPER_CHECK_FAILED = 'wrapper.check.failed',

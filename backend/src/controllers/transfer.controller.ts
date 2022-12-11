@@ -5,6 +5,7 @@ import { User } from 'src/schemas/user.schema';
 import { InitTransferInput } from 'src/inputs/init-transfer.input';
 import { TransferService } from 'src/services/transfer.service';
 import { OffchainProviderEventInput } from 'src/inputs/offchain-provider-event-input.input';
+import { OffchainProviderGuard } from 'src/auth/offchain-provider-auth.guard';
 
 @Controller('transfers')
 export class TransferController {
@@ -44,6 +45,7 @@ export class TransferController {
     return transfer;
   }
 
+  @UseGuards(OffchainProviderGuard)
   @Post('/notify')
   async offchainProviderTransferEvent(
     @Body() offchainProviderEventInput: OffchainProviderEventInput,
