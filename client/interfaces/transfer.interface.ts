@@ -7,7 +7,12 @@ interface ITransfer {
   amount: number;
   createdAt: Date;
   updatedAt: Date;
-  status: TransferStatus
+  status: TransferStatus;
+  sufficientBalance: boolean;
+  routingOnChainStarted: boolean;
+  routingOnChainCompleted: boolean;
+  offchainTransferStarted: boolean;
+  offchainTransferCompleted: boolean;
 }
 
 export default ITransfer

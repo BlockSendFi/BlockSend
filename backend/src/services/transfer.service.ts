@@ -114,14 +114,12 @@ export class TransferService implements OnApplicationBootstrap {
 
   async getMyTransfers(user) {
     return this.transferModel
-      .find({ user: user._id }, null, { $sort: { createdAt: -1 } })
+      .find({ user: user._id }, null, { $sort: { createdAt: 1 } })
       .lean();
   }
 
   async getTransfer(transferId) {
-    return this.transferModel
-      .findById(transferId, null, { $sort: { createdAt: -1 } })
-      .lean();
+    return this.transferModel.findById(transferId).lean();
   }
 
   private async startTransfer(transfer: Transfer) {
@@ -156,7 +154,10 @@ export class TransferService implements OnApplicationBootstrap {
 
       await this.transferModel
         .findByIdAndUpdate(transfer._id, {
-          $set: { offchainTransferTx: tx.hash },
+          $set: {
+            offchainTransferTx: tx.hash,
+            routingOnChainStarted: true,
+          },
         })
         .exec();
       this.logger.log(
@@ -174,18 +175,8 @@ export class TransferService implements OnApplicationBootstrap {
   }
 
   private async notifyOffchainProvider(transfer) {
-    console.log(
-      '🚀 ~ file: transfer.service.ts:171 ~ TransferService ~ notifyOffchainProvider ~ notifyOffchainProvider',
-    );
-    console.log(
-      '🚀 ~ file: transfer.service.ts:190 ~ TransferService ~ notifyOffchainProvider ~ transfer',
-      transfer,
-    );
     const user = await this.userService.getUser(transfer.user);
-    console.log(
-      '🚀 ~ file: transfer.service.ts:185 ~ TransferService ~ notifyOffchainProvider ~ user',
-      user,
-    );
+
     const offchainProviderParams = {
       mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
       amount: transfer.amountWithoutFees / 1000000,
@@ -217,6 +208,7 @@ export class TransferService implements OnApplicationBootstrap {
           $set: {
             status: TransferStatus.OFFRAMP_INIT,
             offchainProviderTrackingId: response.data.id,
+            offchainTransferStarted: true,
           },
         })
         .exec();
@@ -242,6 +234,7 @@ export class TransferService implements OnApplicationBootstrap {
         $set: {
           amountWithoutFees: amountWithoutFees.toNumber(),
           status: TransferStatus.ONCHAIN_TRANSFER_DONE,
+          routingOnChainCompleted: true,
         },
       })
       .exec();
@@ -316,7 +309,10 @@ export class TransferService implements OnApplicationBootstrap {
       this.logger.log(`Transfer ${transfer._id} completed !`);
       await this.transferModel
         .findByIdAndUpdate(transfer._id, {
-          $set: { status: TransferStatus.OFFRAMP_COMPLETED },
+          $set: {
+            status: TransferStatus.OFFRAMP_COMPLETED,
+            offchainTransferCompleted: true,
+          },
         })
         .exec();
     } else if (
