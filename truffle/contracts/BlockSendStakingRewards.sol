@@ -12,7 +12,7 @@ contract BlockSendStakingRewards is Ownable {
     IERC20 private immutable USDCToken;
 
     event Staked(address staker, uint256 _amount);
-    event UnStaked(address staker, uint256 _amount);
+    event Unstaked(address staker, uint256 _amount);
     event WithdrawRewards(address staker, uint256 rewards);
 
     uint256 public startDate;
@@ -46,42 +46,33 @@ contract BlockSendStakingRewards is Ownable {
         emit Staked(msg.sender, _amount);
     }
 
-    function unStake(uint256 _amount) external {
-        require(
-            block.timestamp > endDate,
-            "unstacking impossible!"
-        );
-        require(_amount > 0, "amount not valid!");
-        require(
-            _amount <= userTokensStaked[msg.sender],
-            "your staked tokens less than the input _amount"
-        );
-
-        BKSDToken.transfer(msg.sender, _amount);
-        userTokensStaked[msg.sender] -= _amount;
-        totalStaked -= _amount;
-
-        emit UnStaked(msg.sender, _amount);
-    }
-
-    function withdrawRewards() external {
-        require(block.timestamp > endDate, "withdraw impossible!");
+    function claimAndUnstake() external {
+        require(block.timestamp > endDate, "unstacking impossible!");
         require(userTokensStaked[msg.sender] > 0, "no staked tokens");
 
-        uint256 reward = (totalRewards / totalStaked) * userTokensStaked[msg.sender];
-        require(reward > 0, "no rewards earned yet");
+        //  We calculate the rewards and send them to the user
+        uint256 USDCRewards = (userTokensStaked[msg.sender] / totalStaked) *
+            totalRewards;
+        USDCToken.transfer(msg.sender, USDCRewards);
+        emit WithdrawRewards(msg.sender, USDCRewards);
 
-        USDCToken.transfer(msg.sender, reward);
+        //  We send the staked tokens back to the user
+        totalStaked -= userTokensStaked[msg.sender];
+        BKSDToken.transfer(msg.sender, userTokensStaked[msg.sender]);
+        emit Unstaked(msg.sender, userTokensStaked[msg.sender]);
         userTokensStaked[msg.sender] = 0;
-
-        emit WithdrawRewards(msg.sender, reward);
     }
 
-    function getUserStakedTokens() public view returns (uint256) {
+    function getMyStakedTokens() public view returns (uint256) {
         return userTokensStaked[msg.sender];
     }
 
-    function addRewards(uint256 _amount) external {
+    function getMyUSDCRewards() public view returns (uint256) {
+        return (userTokensStaked[msg.sender] / totalStaked) * totalRewards;
+    }
+
+    // TODO: Change the modifier here
+    function addRewards(uint256 _amount) external onlyOwner {
         require(
             block.timestamp >= startDate && block.timestamp <= endDate,
             "add rewards impossible!"
