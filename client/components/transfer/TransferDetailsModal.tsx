@@ -6,7 +6,7 @@ import { AuthContext } from '../../contexts/auth.context';
 import Loader from '../common/Loader';
 import TransferResume from './TransferResume';
 import ITransfer from '../../interfaces/transfer.interface';
-import { FaCheck, FaCheckCircle, FaQuestion, FaQuestionCircle, FaTimes, FaTimesCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaQuestionCircle, FaTimesCircle } from 'react-icons/fa';
 import { TransferStatus } from '../../enums/transfer-status.enum';
 import LoadingIcon from '../common/icons/LoadingIcon';
 
