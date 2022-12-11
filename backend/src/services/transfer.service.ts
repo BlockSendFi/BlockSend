@@ -102,7 +102,7 @@ export class TransferService implements OnApplicationBootstrap {
   async initTransfer(initTransferInput, user) {
     const transfer = await new this.transferModel({
       user: user._id,
-      userWalletAddress: initTransferInput.walletAddress,
+      userWalletAddress: `0x${initTransferInput.walletAddress}`,
       amount: initTransferInput.amount,
       recipient: initTransferInput.recipient,
     }).save();
@@ -148,6 +148,22 @@ export class TransferService implements OnApplicationBootstrap {
         transfer.userWalletAddress,
         amountDecimals,
         optionsTx,
+      );
+      console.log(
+        '🚀 ~ file: transfer.service.ts:148 ~ TransferService ~ startTransfer ~ transfer._id.toString()',
+        transfer._id.toString(),
+      );
+      console.log(
+        '🚀 ~ file: transfer.service.ts:178 ~ TransferService ~ startTransfer ~ amountDecimals',
+        amountDecimals,
+      );
+      console.log(
+        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.userWalletAddress',
+        transfer.userWalletAddress,
+      );
+      console.log(
+        '🚀 ~ file: transfer.service.ts:176 ~ TransferService ~ startTransfer ~ transfer.userWalletAddress',
+        transfer.userWalletAddress,
       );
 
       this.logger.log(tx);
