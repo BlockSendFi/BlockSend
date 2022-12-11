@@ -1,17 +1,18 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useContext } from 'react';
 import ITransfer from '../../interfaces/transfer.interface';
 import dayjs from 'dayjs'
+import { ModalEnum } from '../../enums/modal.enum';
+import { LayoutContext } from '../../contexts/layout.context';
 import { FaChevronRight } from 'react-icons/fa';
 
 const TransferItem: FC<{ transfer: ITransfer }> = ({ transfer }) => {
-  const [open, setOpen] = useState(false)
+  const { openModal } = useContext(LayoutContext);
 
-  const showDetails = () => null
-
+  const openDetails = () => openModal(ModalEnum.TRANSFER_DETAILS, { transferId: transfer._id })
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-3 border border-gray-200 p-2 cursor-pointer rounded-2xl" onClick={showDetails}>
-      <div className="flex justify-between items-center " onClick={() => setOpen(!open)}>
+    <div className="flex flex-col gap-2 px-4 py-3 border border-gray-200 p-2 cursor-pointer rounded-2xl" onClick={openDetails}>
+      <div className="flex justify-between items-center " onClick={openDetails}>
         <div className="flex gap-2" >
           <div className="rounded-full h-12 w-12 text-2xl font-bold text-white bg-blue-main flex items-center justify-center">
             {`${transfer.recipient.firstName[0]}${transfer.recipient.lastName[0]}`}

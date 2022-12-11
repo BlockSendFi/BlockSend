@@ -118,6 +118,12 @@ export class TransferService implements OnApplicationBootstrap {
       .lean();
   }
 
+  async getTransfer(transferId) {
+    return this.transferModel
+      .findById(transferId, null, { $sort: { createdAt: -1 } })
+      .lean();
+  }
+
   private async startTransfer(transfer: Transfer) {
     this.logger.log(`Starting transfer ${transfer._id} now !`);
     await this.transferModel
