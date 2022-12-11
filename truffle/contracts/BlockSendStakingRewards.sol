@@ -18,7 +18,6 @@ contract BlockSendStakingRewards is Ownable {
     uint256 public startDate;
     uint256 public endDate;
 
-    // uint256 public totalStaked;
     uint256 public totalPowers;
     uint256 public totalRewards;
     uint256 public userPower;

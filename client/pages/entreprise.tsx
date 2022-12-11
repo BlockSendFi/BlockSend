@@ -17,7 +17,7 @@ const HOME_SECTIONS = [
 const IndexPage = () => {
   return (
     <Layout>
-      <div>
+      <div className="w-full">
         {
           HOME_SECTIONS.map((section, index) => (
             <HomeSection section={section} key={index} />
