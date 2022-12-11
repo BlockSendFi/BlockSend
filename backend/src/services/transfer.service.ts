@@ -178,7 +178,8 @@ export class TransferService implements OnApplicationBootstrap {
     const user = await this.userService.getUser(transfer.user);
 
     const offchainProviderParams = {
-      mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
+      // mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
+      mode: 'sandbox',
       amount: transfer.amountWithoutFees / 1000000,
       transferTx: transfer.offchainTransferTx,
       destination: transfer.recipient,

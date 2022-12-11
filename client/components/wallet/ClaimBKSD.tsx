@@ -39,7 +39,7 @@ const ClaimBKSD = () => {
                 {"BKSD"}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center w-full">
               <Button title={"Récupérer maintenant 🔥"} />
             </div>
           </div>
@@ -57,7 +57,7 @@ const ClaimBKSD = () => {
                 {"USDC"}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center w-full">
               <Button title={"Récupérer maintenant 🤩"} />
             </div>
           </div>
