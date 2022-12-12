@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.13;
 
 import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
@@ -7,6 +7,7 @@ import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IFixedRateWrapper.sol";
 import "./interfaces/ISynthereum.sol";
 import "./BlockSendToken.sol";
+import "./BlockSendStakingRewards.sol";
 
 contract BlockSendRouter is Ownable {
     IFixedRateWrapper private jarvisWrapper;
@@ -15,31 +16,24 @@ contract BlockSendRouter is Ownable {
     IERC20 private jEURToken;
     IERC20 private USDCToken;
     BlockSendToken private BKSDToken;
+    BlockSendStakingRewards private BKSDRewards;
     mapping(address => uint256) public transferRewardsBalance;
 
-    address private WRAPPER_CONTRACT =
-        0xb07Cb016440331be4D2f532b20d892a420476AD0;
-    address private SYNTHEREUM_CONTRACT =
-        0x65a7b4Ff684C2d08c115D55a4B089bf4E92F5003;
-    address private EURE_TOKEN_CONTRACT =
-        0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6;
-    address private JEUR_TOKEN_CONTRACT =
-        0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c;
-    address private USDC_TOKEN_CONTRACT =
-        0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address private WRAPPER_CONTRACT = 0xb07Cb016440331be4D2f532b20d892a420476AD0;
+    address private SYNTHEREUM_CONTRACT = 0x65a7b4Ff684C2d08c115D55a4B089bf4E92F5003;
+    address private EURE_TOKEN_CONTRACT = 0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6;
+    address private JEUR_TOKEN_CONTRACT = 0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c;
+    address private USDC_TOKEN_CONTRACT = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
     // address private BKSD_TOKEN_CONTRACT =
     //     0x8d587d2Eaac88e6E228300180c921674a27ABFf3; // TODO: change this
 
-    address private EUR_USD_AGGREGATOR =
-        0x73366Fe0AA0Ded304479862808e02506FE556a98;
-    address private USDC_USD_AGGREGATOR =
-        0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7;
+    address private EUR_USD_AGGREGATOR = 0x73366Fe0AA0Ded304479862808e02506FE556a98;
+    address private USDC_USD_AGGREGATOR = 0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7;
 
     address private HUB2_WALLET = 0xeD85CAeb52C34bD35dfeEB2d4e0bC936a0Db0923;
-    address private BLOCKSEND_BACKEND =
-        0x913Cd67dA3b17be7f66E865158cDF9a5c4F2a850;
-    address private BLOCKSEND_WALLET =
-        0x7f3eE84Fd13D815ff1005B7904Cd67084D8f353F;
+    address private BLOCKSEND_BACKEND = 0x913Cd67dA3b17be7f66E865158cDF9a5c4F2a850;
+    address private BLOCKSEND_WALLET = 0x7f3eE84Fd13D815ff1005B7904Cd67084D8f353F;
+    address private BLOCKSEND_REWARDS_CONTRACT = 0x7f3eE84Fd13D815ff1005B7904Cd67084D8f353F;
 
     mapping(string => Remittance) public transfers;
     struct Remittance {
@@ -79,7 +73,7 @@ contract BlockSendRouter is Ownable {
         _;
     }
 
-    constructor(address _BKSD_TOKEN_CONTRACT) {
+    constructor(address _BKSD_TOKEN_CONTRACT, address _BKSD_REWARDS_CONTRACT) {
         allowed[BLOCKSEND_BACKEND] = true;
         jarvisWrapper = IFixedRateWrapper(WRAPPER_CONTRACT);
         jarvisSynthereum = ISynthereum(SYNTHEREUM_CONTRACT);
@@ -87,6 +81,7 @@ contract BlockSendRouter is Ownable {
         jEURToken = IERC20(JEUR_TOKEN_CONTRACT);
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
         BKSDToken = BlockSendToken(_BKSD_TOKEN_CONTRACT);
+        BKSDRewards = BlockSendStakingRewards(_BKSD_REWARDS_CONTRACT);
     }
 
     /**
@@ -346,20 +341,20 @@ contract BlockSendRouter is Ownable {
         uint256 _collateralRedeemed,
         uint256 _feePaid
     ) internal returns (bool ok) {
-        (uint256 blocksendAmount, uint256 userAmount) = calculateBlockSendFees(
+        (uint256 blocksendAmount, uint256 userAmount, uint256 rewardsAmount) = calculateBlockSendFees(
             _collateralRedeemed,
             _feePaid
         );
 
-        bool okBlocksend = USDCToken.transfer(
-            BLOCKSEND_WALLET,
-            blocksendAmount
-        );
-        bool okHUB2 = USDCToken.transfer(HUB2_WALLET, userAmount);
+        USDCToken.transfer(BLOCKSEND_WALLET, blocksendAmount);
+        USDCToken.transfer(BLOCKSEND_REWARDS_CONTRACT, rewardsAmount);
+        USDCToken.transfer(HUB2_WALLET, userAmount);
+
+        BKSDRewards.addRewards(rewardsAmount);
 
         collateralSent(_transferId, userAmount, blocksendAmount);
 
-        return okHUB2 && okBlocksend;
+        return true;
     }
 
     // *********************************************************************************
@@ -368,9 +363,11 @@ contract BlockSendRouter is Ownable {
     function calculateBlockSendFees(
         uint256 _amount,
         uint256 _feePaid
-    ) internal pure returns (uint256 blocksendAmount, uint256 userAmount) {
+    ) internal pure returns (uint256 blocksendAmount, uint256 userAmount, uint256 rewardsAmount) {
         blocksendAmount = ((_amount * 14) / 1000) - _feePaid;
-        userAmount = _amount - blocksendAmount;
+        rewardsAmount = ((blocksendAmount * 18) / 100);
+        blocksendAmount -= rewardsAmount;
+        userAmount = _amount - blocksendAmount - rewardsAmount;
     }
 
     // *********************************************************************************

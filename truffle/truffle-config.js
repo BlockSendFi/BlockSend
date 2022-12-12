@@ -32,7 +32,7 @@ module.exports = {
 			provider: () => new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_ID}`),
 			network_id: '137',
       gas: 4600000,
-      gasPrice: web3.utils.toWei("50", "gwei"),
+      gasPrice: web3.utils.toWei("100", "gwei"),
 		},
   },
 
