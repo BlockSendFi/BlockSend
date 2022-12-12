@@ -1,3 +1,4 @@
+import { BigNumber, utils } from 'ethers';
 import Link from 'next/link';
 import React from 'react';
 import { useAccount, useBalance } from 'wagmi';
@@ -11,12 +12,13 @@ const WalletBalance = () => {
     address,
     chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
     token: process.env.NEXT_PUBLIC_BKSD_TOKEN as `0x${string}`,
+    watch: true
   })
 
   if (isLoading) return <Loader />
   if (isError) return <div>{"Error fetching balance"}</div>
 
-  const BKSDBalance = data?.value.toNumber() || 0
+  const BKSDBalance = utils.formatUnits((data?.value as BigNumber).toString(), 18) || "0"
 
   return (
     <div className="px-4 py-6 border rounded-2xl  border-gray-200">
@@ -38,7 +40,7 @@ const WalletBalance = () => {
 
 
           {
-            BKSDBalance > 0 ? (
+            !(data?.value as BigNumber).isZero() ? (
               <Button title={"Stacker mes BKSD 🚀"} />
             ) : (
               <div className="text-center">

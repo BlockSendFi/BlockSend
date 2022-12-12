@@ -3,14 +3,15 @@ import { useAccount, useNetwork } from 'wagmi';
 import DetectWallet from '../common/DetectWallet';
 import MyContacts from '../contact/MyContacts';
 import MyTransfers from '../transfer/MyTransfers';
-import ClaimBKSD from '../wallet/ClaimBKSD';
+import Rewards from '../wallet/Rewards';
+import ClaimBKSD from '../wallet/Rewards';
 import WalletBalance from '../wallet/WalletBalance';
 
 const InnerApp = () => {
   const { chain } = useNetwork()
   const chainId = parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string)
   const wrongNetwork = chain?.id !== chainId
-  const { isConnected, address } = useAccount()
+  const { isConnected } = useAccount()
   return (
     <div className="flex gap-8 flex-col">
       <DetectWallet />
@@ -22,14 +23,11 @@ const InnerApp = () => {
               <MyTransfers />
               <MyContacts />
             </div>
-            {
-              address && (
-                <div className="flex flex-col gap-4 w-[300px]">
-                  <WalletBalance />
+            <div className="flex flex-col gap-4 w-[300px]">
+              <WalletBalance />
 
-                  <ClaimBKSD address={address} />
-                </div>
-              )
+              <Rewards />
+            </div>
             }
           </div>
 
