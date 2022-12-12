@@ -6,7 +6,7 @@ import BlockSendRouter from '../../contracts/BlockSendRouter.json'
 import { BigNumber, utils } from 'ethers';
 import Button from '../common/Button';
 
-const ClaimBKSD: FC<{ address: string }> = ({ address }) => {
+const ClaimBKSD: FC<{ address: `0x${string}` }> = ({ address }) => {
   const { isError, isLoading, data } = useContractRead({
     address: process.env.NEXT_PUBLIC_BLOCKSEND_ROUTER_ADDRESS,
     abi: BlockSendRouter.abi,
