@@ -70,7 +70,7 @@ This box comes with `truffle` contracts testing and front-end testing with `jest
 An ERC20 stndard token that the users can claim as a rewards for their tranfers.
 
 #### BlockSend Router
-The main contract which contains the business logic of the remittance.
+The main contract that handles the business logic of the remittance.
 it allows money to be routed from the user wallet to the off-ramp solution (HUB2 in our architecture).
 Money routing is done in several steps:
 - Transfer of EURe from the user's wallet after prior approval.
