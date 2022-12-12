@@ -49,7 +49,6 @@ contract BlockSendStakingRewards is Ownable {
     function stake(uint256 _amount, uint256 _additionalDuration) external {
         // require(block.timestamp < startDate, "stacking impossible!");
 
-        BKSDToken.approve(address(this), _amount);
         BKSDToken.transferFrom(msg.sender, address(this), _amount);
         userTokensStaked[msg.sender] += _amount;
 
