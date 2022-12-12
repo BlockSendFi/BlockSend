@@ -278,7 +278,7 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  @Cron('* * * * *')
+  @Cron('*/5 * * * *')
   async checkPendingTransfers() {
     this.logger.log('[CRON] Checking pending transfers');
 
