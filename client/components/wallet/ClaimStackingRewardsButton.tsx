@@ -11,13 +11,13 @@ const ClaimStackingRewardsButton = () => {
     chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
   })
 
-  const { write } = useContractWrite(config)
+  const { write, isLoading } = useContractWrite(config)
 
   const handleClaim = () => write?.()
 
   return (
     <div className="text-center w-full">
-      <Button title={"Récupérer maintenant 🤩"} onClick={handleClaim} />
+      <Button title={"Récupérer maintenant 🤩"} onClick={handleClaim} loading={isLoading} />
     </div>
   );
 };

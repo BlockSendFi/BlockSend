@@ -6,11 +6,11 @@ BlockSend allow you to send money abroad with reduce fees and transparency. The 
 
 ## Context
 
-This project is the final project for the Alyra certification, the subject was free but must used blockchain technology.
+This project is the final project for the Alyra certification, the subject was free but must used blockchain technology and some technical figures were imposed.
 
 ## Objective
 
-The objective was to have a simple application that allow user to send money abroad with a low cost and transparency. We build simple interface allow the user to add contact and then program a transaction.
+The objective was to have an application that allow user to send money abroad with a low cost and transparency. We build simple interface to add contacts and configure a transfer.
 
 ## Organization
 
@@ -19,53 +19,60 @@ To share, organize, collaborate and track the progress of the project:
     - [Confluence for doc](https://blocksend.atlassian.net/wiki/spaces/BLOCKSEND/pages/426049/Sommaire)
     - [design with Figma](https://www.figma.com/file/V8fQ5aJYz9IreIc5WkJLf7/ASHLEY_WK_061222?node-id=0%3A1)
 
+We have a daily technical meeting every day at 5pm. We use Discord to communicate with others team members.
+We organized the trello as a Kanban board, describing the differents steps of our workflow (to do, in progress, code review, test, etc...)
+
 ## Architecture
 
-We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database.
-![alt text](./docs/architeture.png)
+We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database. The user will allow the smart contract to transfer their EURe and the backend will detect when the user have a sufficient balance to make the onchain transfer.
 
+![alt text](./docs/architeture.png)
 
 ## Getting Started
 
-1. Install test and solidity dependencies
-    ```
-    npm install
-    ```
-1. Install [Truffle](http://truffleframework.com)
-    ```
-    npm install -g truffle
-    ```
-1. Migrate the contracts with truffle.
-    ```
-    truffle migrate --network 'network_name'
-    ```
-1. Run the webpack server for front-end hot reloading
-    ```
-    npm run dev
-    ```
+    1. Install test and solidity dependencies
+        ```
+        npm install
+        ```
+    1. Install [Truffle](http://truffleframework.com)
+        ```
+        npm install -g truffle
+        ```
+    1. Migrate the contracts with truffle.
+        ```
+        truffle migrate --network 'network_name'
+        ```
+    1. Run the webpack server for front-end hot reloading
+        ```
+        npm run dev
+        ```
 
 ## Tests
-This box comes with `truffle` contracts testing and front-end testing with `jest`
-1. Truffle contract tests
-    ```
-    truffle test
-    ```
+
+    This box comes with `truffle` contracts testing and front-end testing with `jest`
+    1. Truffle contract tests
+        ```
+        truffle test
+        ```
 
 ## Building for Production
-1. Migrate the contracts with truffle.
-    ```
-    truffle migrate --network 'network_name'
-    ```
-1. Create production bundle
-    ```
-    npm run build
-    ```
-1. The production build will be compiled in the `build/app` folder.
-    
+
+    1. Migrate the contracts with truffle.
+        ```
+        truffle migrate --network 'network_name'
+        ```
+    1. Create production bundle
+        ```
+        npm run build
+        ```
+    1. The production build will be compiled in the `build/app` folder.
 
 ## Realization
 
 ### Smart Contracts
+
+We have three smart contracts that interact with each other, the SC BlockSendRouter is the only minter of the token so that we guarantee that the token is minted correctly when the user makes a claim of his rewards from the Router.
+The SC Router is also responsible for transferring the rewards that the stackers will share at the end of the stacking period
 
 #### BlockSend Token
 
@@ -76,12 +83,12 @@ An ERC20 stndard token that the users can claim as a rewards for their tranfers.
 The main contract that handles the business logic of the remittance.
 it allows money to be routed from the user wallet to the off-ramp solution (HUB2 in our architecture).
 Money routing is done in several steps:
-- Transfer of EURe from the user's wallet after prior approval.
-- Wrapping EURe in jEUR with Jarvis Wrapper.
-- Redeem USDC with jEUR via Jarvis Syntherium.
-- Calculate the BlockSend fees to be charged taking into account the network fees that BlockSend bears.
-- Calculate the rewards that will be redistributed after the stacking of the rewards.
-- Sent the UCDS to the Off-Ramp solution with the additional info sent from the BackEnd.
+    - Transfer of EURe from the user's wallet after prior approval.
+    - Wrapping EURe in jEUR with Jarvis Wrapper.
+    - Redeem USDC with jEUR via Jarvis Syntherium.
+    - Calculate the BlockSend fees to be charged taking into account the network fees that BlockSend bears.
+    - Calculate the rewards that will be redistributed after the stacking of the rewards.
+    - Sent the UCDS to the Off-Ramp solution with the additional info sent from the BackEnd.
 
 #### BlockSend Stacking
 
@@ -96,4 +103,3 @@ We build a frontend with ReactJs and NextJS. We used the library Wagmi and ether
 We have a backend with NodeJs and NestJs. We have a centralized datatabase to store personal data (RGPD).
 
 ### Unit tests
-
