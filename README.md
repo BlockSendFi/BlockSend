@@ -15,6 +15,8 @@ The objective was to have a simple application that allow user to send money abr
 ## Architecture
 
 We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database.
+![alt text](./architeture.png)
+
 
 ## Getting Started
 
