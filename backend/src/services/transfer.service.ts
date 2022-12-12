@@ -152,7 +152,6 @@ export class TransferService implements OnApplicationBootstrap {
 
       const tx = await this.BlockSendContract.initializeTransfer(
         transfer.identifier,
-        // transfer.userWalletAddress,
         utils.getAddress(transfer.userWalletAddress),
         amountDecimals,
         optionsTx,
@@ -222,10 +221,7 @@ export class TransferService implements OnApplicationBootstrap {
         })
         .exec();
     } catch (error) {
-      console.log(
-        '🚀 ~ file: transfer.service.ts:218 ~ TransferService ~ notifyOffchainProvider ~ error',
-        error,
-      );
+      this.logger.error(error);
       this.logger.log(
         `Failed to notify offchain provider for transfer ${transfer._id}`,
       );

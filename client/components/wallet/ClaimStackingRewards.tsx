@@ -1,17 +1,16 @@
 import { BigNumber, utils } from 'ethers';
-import BlockSendRouter from '../../contracts/BlockSendRouter.json'
+import BlockSendStakingRewards from '../../contracts/BlockSendStakingRewards.json'
 import React, { FC } from 'react';
 import { useContractRead } from 'wagmi';
 import Loader from '../common/Loader';
 import ClaimTransferRewardsButton from './ClaimTransferRewardsButton';
 
-const ClaimStackingRewards: FC<{ address: `0x${string}` }> = ({ address }) => {
+const ClaimStackingRewards: FC = () => {
   const { isError, isLoading, data } = useContractRead({
-    address: process.env.NEXT_PUBLIC_BLOCKSEND_ROUTER_ADDRESS,
-    abi: BlockSendRouter.abi,
-    functionName: 'transferRewardsBalance',
+    address: process.env.NEXT_PUBLIC_BLOCKSEND_STACKING_ADDRESS,
+    abi: BlockSendStakingRewards.abi,
+    functionName: 'getMyUSDCRewards',
     chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
-    args: [address],
     watch: true,
   })
 

@@ -37,8 +37,6 @@ const TransferConfirmation: FC<{ transfer: Partial<ITransfer> }> = ({ transfer }
   })
 
   const approveEUReForTransfer = async () => {
-    // TODO: Get pending transfers transfer and compute the total amount
-
     setApproveEUReLoading(true)
     const decimalAmount = utils.parseUnits((transfer.amount as number).toString(), 18)
 

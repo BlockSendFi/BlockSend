@@ -10,12 +10,12 @@ const StakeBKSDButton: FC<{ balance: BigNumber }> = ({ balance }) => {
     abi: BlockSendStakingRewards.abi,
     functionName: 'stake',
     chainId: parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string),
-    args: [balance, 0],
+    args: [1, 0],
   })
 
   const { write } = useContractWrite(config)
 
-  const handleClaim = () => write?.()
+  const handleClaim = () => write?.(1, 0)
 
   return (
     <div className="text-center w-full">
