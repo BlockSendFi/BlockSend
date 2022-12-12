@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useAccount } from 'wagmi';
-import ClaimStackingRewards from './ClaimStackingRewards';
+// import ClaimStackingRewards from './ClaimStackingRewards';
 import ClaimTransferRewards from './ClaimTransferRewards';
 
 const Rewards = () => {
@@ -18,7 +17,7 @@ const Rewards = () => {
 
       <div className="flex flex-col gap-4">
         <ClaimTransferRewards address={address} />
-        <ClaimStackingRewards address={address} />
+        {/* <ClaimStackingRewards /> */}
       </div>
     </div>
   );
