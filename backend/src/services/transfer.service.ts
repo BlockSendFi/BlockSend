@@ -189,7 +189,8 @@ export class TransferService implements OnApplicationBootstrap {
       mode: 'sandbox',
       amount: transfer.amountWithoutFees / 1000000,
       transferTx: transfer.offchainTransferTx,
-      destination: transfer.recipient,
+      // We change the phoneNumber for the integration test
+      destination: { ...transfer.recipient, phoneNumber: '00000001' },
       origin: {
         firstName: user.firstName,
         lastName: user.lastName,
