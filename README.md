@@ -6,11 +6,11 @@ BlockSend allow you to send money abroad with reduce fees and transparency. The 
 
 ## Context
 
-This project is the final project for the Alyra certification, the subject was free but must used blockchain technology.
+This project is the final project for the Alyra certification, the subject was free but must used blockchain technology and some technical figures were imposed.
 
 ## Objective
 
-The objective was to have a simple application that allow user to send money abroad with a low cost and transparency. We build simple interface allow the user to add contact and then program a transaction.
+The objective was to have an application that allow user to send money abroad with a low cost and transparency. We build simple interface to add contacts and configure a transfer.
 
 ## Organization
 
@@ -19,9 +19,13 @@ To share, organize, collaborate and track the progress of the project:
     - [Confluence for doc](https://blocksend.atlassian.net/wiki/spaces/BLOCKSEND/pages/426049/Sommaire)
     - [design with Figma](https://www.figma.com/file/V8fQ5aJYz9IreIc5WkJLf7/ASHLEY_WK_061222?node-id=0%3A1)
 
+We have a daily technical meeting every day at 5pm. We use Discord to communicate with others team members.
+We organized the trello as a Kanban board, describing the differents steps of our workflow (to do, in progress, code review, test, etc...)
+
 ## Architecture
 
-We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database.
+We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database. The user will allow the smart contract to transfer their EURe and the backend will detect when the user have a sufficient balance to make the onchain transfer.
+
 ![alt text](./docs/architeture.png)
 
 ## Getting Started
@@ -66,6 +70,9 @@ We choose to have an hybrid architecture with a smart contract on the blockchain
 ## Realization
 
 ### Smart Contracts
+
+We have three smart contracts that interact with each other, the SC BlockSendRouter is the only minter of the token so that we guarantee that the token is minted correctly when the user makes a claim of his rewards from the Router.
+The SC Router is also responsible for transferring the rewards that the stackers will share at the end of the stacking period
 
 #### BlockSend Token
 
