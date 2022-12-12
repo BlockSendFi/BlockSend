@@ -15,6 +15,7 @@ import { BigNumber, ethers, utils } from 'ethers';
 import ERC20 from '../../contracts/ERC20.json';
 import BlockSendRouter from '../../contracts/BlockSendRouter.json';
 import { UserService } from './user.service';
+import { Cron } from '@nestjs/schedule';
 
 interface IOptionsTx {
   gasPrice: BigNumber;
@@ -277,7 +278,7 @@ export class TransferService implements OnApplicationBootstrap {
     }
   }
 
-  // @Cron('* * * * *') // TODO : do not forget to activate cron
+  @Cron('* * * * *')
   async checkPendingTransfers() {
     this.logger.log('[CRON] Checking pending transfers');
 

@@ -22,7 +22,7 @@ const StakeBKSDButton: FC<{ balance: BigNumber }> = ({ balance }) => {
     functionName: 'approve',
   })
 
-  const { write } = useContractWrite(config)
+  const { write, isLoading } = useContractWrite(config)
 
   const handleClaim = async () => {
     try {
@@ -37,7 +37,7 @@ const StakeBKSDButton: FC<{ balance: BigNumber }> = ({ balance }) => {
 
   return (
     <div className="text-center w-full">
-      <Button title={"Stacker mes BKSD 🚀"} onClick={handleClaim} className="w-full" />
+      <Button title={"Stacker mes BKSD 🚀"} onClick={handleClaim} className="w-full" loading={isLoading} />
     </div>
   );
 };
