@@ -4,7 +4,6 @@ import DetectWallet from '../common/DetectWallet';
 import MyContacts from '../contact/MyContacts';
 import MyTransfers from '../transfer/MyTransfers';
 import Rewards from '../wallet/Rewards';
-import ClaimBKSD from '../wallet/Rewards';
 import WalletBalance from '../wallet/WalletBalance';
 
 const InnerApp = () => {
@@ -28,15 +27,7 @@ const InnerApp = () => {
 
               <Rewards />
             </div>
-            }
           </div>
-
-          {/* <div className="flex justify-between w-full text-gray-400 border-t border-gray-200 pt-4 text-sm mt-16">
-            <div className="px-2">{"Whitepaper"}</div>
-            <div className="px-2">{"FAQ"}</div>
-            <div className="px-2">{"Politique de confidentialité"}</div>
-            <div className="px-2">{"Conditions générale d'utilisation"}</div>
-          </div> */}
 
         </>)
       }

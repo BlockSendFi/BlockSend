@@ -1,10 +1,9 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import Link from 'next/link';
 import React from 'react';
 import { useAccount, useBalance } from 'wagmi';
-import Button from '../common/Button';
 import Loader from '../common/Loader';
-// import BKSDBalance from './BKSDBalance';
+import StakeBKSDButton from './StakeBKSDButton';
 
 const WalletBalance = () => {
   const { address } = useAccount()
@@ -17,8 +16,6 @@ const WalletBalance = () => {
 
   if (isLoading) return <Loader />
   if (isError) return <div>{"Error fetching balance"}</div>
-
-  const BKSDBalance = utils.formatUnits((data?.value as BigNumber).toString(), 18) || "0"
 
   return (
     <div className="px-4 py-6 border rounded-2xl  border-gray-200">
@@ -39,9 +36,10 @@ const WalletBalance = () => {
           </div>
 
 
+
           {
             !(data?.value as BigNumber).isZero() ? (
-              <Button title={"Stacker mes BKSD 🚀"} />
+              <StakeBKSDButton balance={data?.value as BigNumber} />
             ) : (
               <div className="text-center">
                 <Link className="underline text-sm underline-offset-2" target="_blank" href={"https://mumbai.polygonscan.com/address/0x3c7ebddbe30e07472b7de2e9c739cef89ba6e079"}>{"Acheter du BKSD"}</Link>
