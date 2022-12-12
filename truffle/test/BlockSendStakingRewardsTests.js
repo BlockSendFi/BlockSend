@@ -56,22 +56,6 @@ contract('BlockSendStakingRewards', accounts => {
       await expectRevert(blockSendStakingRewardsInstance.addRewards(amount, {from: _userWallet}), "add rewards impossible!");
     });
 
-    
-
-    it("check stack done", async () => {
-      let amount = new BN(100);
-      await myTokenInstance.approve(blockSendStakingRewardsInstance.address, amount);
-      await myTokenInstance.approve(_userWallet, amount);
-      
-      let userTokensStakedBefore = await blockSendStakingRewardsInstance.getMyStakedTokens({ from: _userWallet});
-      expect(userTokensStakedBefore).to.be.bignumber.equal(new BN(0));
-
-      await blockSendStakingRewardsInstance.stake(amount, 0, { from: _userWallet});
-  
-      let userTokensStakedAfter = await blockSendStakingRewardsInstance.getMyStakedTokens({ from: _userWallet});
-      expect(userTokensStakedAfter).to.be.bignumber.equal(amount);
-    });
-
     it("check unstack done", async () => {
       let amount = new BN(100);
       blockSendStakingRewardsInstance.userTokensStaked[_userWallet]+=amount;
