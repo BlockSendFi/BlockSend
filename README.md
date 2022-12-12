@@ -13,10 +13,11 @@ This project is the final project for the Alyra certification, the subject was f
 The objective was to have a simple application that allow user to send money abroad with a low cost and transparency. We build simple interface allow the user to add contact and then program a transaction.
 
 ## Organization
+
 To share, organize, collaborate and track the progress of the project:
-- [Board Trello](https://trello.com/b/18tZQRRh/blocksend-suivi-dev)
-- [Confluence for doc](https://blocksend.atlassian.net/wiki/spaces/BLOCKSEND/pages/426049/Sommaire)
-- [design with Figma](https://www.figma.com/file/V8fQ5aJYz9IreIc5WkJLf7/ASHLEY_WK_061222?node-id=0%3A1)
+    - [Board Trello](https://trello.com/b/18tZQRRh/blocksend-suivi-dev)
+    - [Confluence for doc](https://blocksend.atlassian.net/wiki/spaces/BLOCKSEND/pages/426049/Sommaire)
+    - [design with Figma](https://www.figma.com/file/V8fQ5aJYz9IreIc5WkJLf7/ASHLEY_WK_061222?node-id=0%3A1)
 
 ## Architecture
 
@@ -61,15 +62,17 @@ This box comes with `truffle` contracts testing and front-end testing with `jest
     ```
 1. The production build will be compiled in the `build/app` folder.
     
-    
+
 ## Realization
 
 ### Smart Contracts
 
 #### BlockSend Token
+
 An ERC20 stndard token that the users can claim as a rewards for their tranfers.
 
 #### BlockSend Router
+
 The main contract that handles the business logic of the remittance.
 it allows money to be routed from the user wallet to the off-ramp solution (HUB2 in our architecture).
 Money routing is done in several steps:
@@ -81,11 +84,16 @@ Money routing is done in several steps:
 - Sent the UCDS to the Off-Ramp solution with the additional info sent from the BackEnd.
 
 #### BlockSend Stacking
+
 The contract that handle the stacking the tokens and redistributing the rewards to the stackers.
 
 ### Front end
 
+We build a frontend with ReactJs and NextJS. We used the library Wagmi and ethers to interact with the smart contract.
+
 ### Back end
+
+We have a backend with NodeJs and NestJs. We have a centralized datatabase to store personal data (RGPD).
 
 ### Unit tests
 
