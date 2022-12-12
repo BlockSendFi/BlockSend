@@ -81,6 +81,7 @@ Money routing is done in several steps:
 - Sent the UCDS to the Off-Ramp solution with the additional info sent from the BackEnd.
 
 #### BlockSend Stacking
+The contract that handle the stacking the tokens and redistributing the rewards to the stackers.
 
 ### Front end
 
