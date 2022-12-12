@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.13;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
@@ -28,6 +28,8 @@ contract BlockSendStakingRewards is Ownable {
     mapping(address => bool) public rewardsAlreadyClaimed;
     mapping(address => uint256) public userAdditionalLock;
 
+    address private router;
+
     constructor(
         address _blocksSendTokenAdress,
         uint256 _startDate,
@@ -37,6 +39,11 @@ contract BlockSendStakingRewards is Ownable {
         USDCToken = IERC20(USDC_TOKEN_CONTRACT);
         startDate = _startDate;
         endDate = _endDate;
+    }
+
+    modifier onlyRouter() {
+        require(msg.sender == router, "Only router can add rewards");
+        _;
     }
 
     function stake(uint256 _amount, uint256 _additionalDuration) external {
@@ -92,7 +99,7 @@ contract BlockSendStakingRewards is Ownable {
             block.timestamp > (endDate + userAdditionalLock[msg.sender]),
             "Too soon to unstake!"
         );
-        require(userTokensStaked[msg.sender] > 0, "No staked tokens");
+        require(userTokensStaked[msg.sender] > 0, "No staked tokens!");
 
         if (rewardsAlreadyClaimed[msg.sender] == false) {
             //  We calculate the rewards and send them to the user
@@ -119,8 +126,12 @@ contract BlockSendStakingRewards is Ownable {
         return (userPowerStaked[msg.sender] / totalPowers) * totalRewards;
     }
 
+    function setRouter(address _router) public onlyOwner {
+        router = _router;
+    }
+
     // TODO: Change the modifier here
-    function addRewards(uint256 _amount) external onlyOwner {
+    function addRewards(uint256 _amount) external onlyRouter {
         require(
             block.timestamp >= startDate && block.timestamp <= endDate,
             "add rewards impossible!"

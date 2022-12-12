@@ -13,11 +13,14 @@ module.exports = async function (deployer) {
   await deployer.deploy(BlockSendStakingRewards, blockSendTokenInstance.address, startDate, endDate);
   const BlockSendStakingRewardsInstance = await BlockSendStakingRewards.deployed()
 
-  await deployer.deploy(BlockSendRouter, blockSendTokenInstance.address);
+  await deployer.deploy(BlockSendRouter, blockSendTokenInstance.address, BlockSendStakingRewardsInstance.address);
   const blockSendRouterInstance = await BlockSendRouter.deployed()
 
   await blockSendTokenInstance.setMinter(blockSendRouterInstance.address)
 
   // Change owner of 
-  console.log(`All is good ;) | BlockSendToken address: ${blockSendTokenInstance.address} | BlockSendRouter address: ${blockSendRouterInstance.address} | BlockSendStakingRewards address: ${BlockSendStakingRewardsInstance.address}`)
+  console.log(`All is good ;)`)
+  console.log(`BlockSendToken address: ${blockSendTokenInstance.address}`)
+  console.log(`BlockSendRouter address: ${blockSendRouterInstance.address}`)
+  console.log(`BlockSendStakingRewards address: ${BlockSendStakingRewardsInstance.address}`)
 };
