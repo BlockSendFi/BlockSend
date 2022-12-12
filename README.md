@@ -67,8 +67,18 @@ This box comes with `truffle` contracts testing and front-end testing with `jest
 ### Smart Contracts
 
 #### BlockSend Token
+An ERC20 stndard token that the users can claim as a rewards for their tranfers.
 
 #### BlockSend Router
+The main contract which contains the business logic of the remittance.
+it allows money to be routed from the user wallet to the off-ramp solution (HUB2 in our architecture).
+Money routing is done in several steps:
+- Transfer of EURe from the user's wallet after prior approval.
+- Wrapping EURe in jEUR with Jarvis Wrapper.
+- Redeem USDC with jEUR via Jarvis Syntherium.
+- Calculate the BlockSend fees to be charged taking into account the network fees that BlockSend bears.
+- Calculate the rewards that will be redistributed after the stacking of the rewards.
+- Sent the UCDS to the Off-Ramp solution with the additional info sent from the BackEnd.
 
 #### BlockSend Stacking
 
