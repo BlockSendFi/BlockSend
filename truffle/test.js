@@ -8,7 +8,7 @@ provider = new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-main
 web3 = new Web3(provider);
 
 // const contract = new web3.eth.Contract(ABI, '0xf5Fcd5F8633F3C26f4b0A52E1C1BA765eAe2E672');
-const contract = new web3.eth.Contract(ABI2, '0x67F9cb9817864d8D4aDf129Cb9472acA24b697B1');
+const contract = new web3.eth.Contract(ABI2, '0x4b2f25AE5c4D3a6921E0C6655e96F187D93B9CF4');
 // contract.getPastEvents('TransferInitilized', {
 //   fromBlock: 0,
 //   toBlock: 'latest'

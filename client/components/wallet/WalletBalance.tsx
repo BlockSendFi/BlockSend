@@ -4,6 +4,7 @@ import React from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import Loader from '../common/Loader';
 import StakeBKSDButton from './StakeBKSDButton';
+import StackedBKSD from './StakedBKSD';
 
 const WalletBalance = () => {
   const { address } = useAccount()
@@ -34,6 +35,13 @@ const WalletBalance = () => {
               {data?.symbol}
             </div>
           </div>
+
+          {
+            address && (
+              <StackedBKSD address={address} />
+            )
+          }
+
 
 
 
