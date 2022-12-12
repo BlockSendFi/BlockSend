@@ -12,6 +12,12 @@ This project is the final project for the Alyra certification, the subject was f
 
 The objective was to have a simple application that allow user to send money abroad with a low cost and transparency. We build simple interface allow the user to add contact and then program a transaction.
 
+## Organization
+To share, organize, collaborate and track the progress of the project:
+- [Board Trello](https://trello.com/b/18tZQRRh/blocksend-suivi-dev)
+- [Documentation](https://blocksend.atlassian.net/wiki/spaces/BLOCKSEND/pages/426049/Sommaire)
+- [Figma](https://www.figma.com/file/V8fQ5aJYz9IreIc5WkJLf7/ASHLEY_WK_061222?node-id=0%3A1)
+
 ## Architecture
 
 We choose to have an hybrid architecture with a smart contract on the blockchain and a backend to store some confidential data in a centralised database.
