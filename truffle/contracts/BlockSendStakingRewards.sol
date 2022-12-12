@@ -47,7 +47,7 @@ contract BlockSendStakingRewards is Ownable {
     }
 
     function stake(uint256 _amount, uint256 _additionalDuration) external {
-        // require(block.timestamp < startDate, "stacking impossible!");
+        require(block.timestamp < startDate, "stacking impossible!");
 
         BKSDToken.transferFrom(msg.sender, address(this), _amount);
         userTokensStaked[msg.sender] += _amount;
@@ -79,7 +79,7 @@ contract BlockSendStakingRewards is Ownable {
     }
 
     function claimRewards() external {
-        // require(block.timestamp > endDate, "Too soon to claim rewards!");
+        require(block.timestamp > endDate, "Too soon to claim rewards!");
         require(
             rewardsAlreadyClaimed[msg.sender] == false,
             "Already claimed rewards!"
@@ -93,10 +93,10 @@ contract BlockSendStakingRewards is Ownable {
     }
 
     function unstake() external {
-        // require(
-        //     block.timestamp > (endDate + userAdditionalLock[msg.sender]),
-        //     "Too soon to unstake!"
-        // );
+        require(
+            block.timestamp > (endDate + userAdditionalLock[msg.sender]),
+            "Too soon to unstake!"
+        );
         require(userTokensStaked[msg.sender] > 0, "No staked tokens!");
 
         if (rewardsAlreadyClaimed[msg.sender] == false) {
@@ -128,10 +128,10 @@ contract BlockSendStakingRewards is Ownable {
     }
 
     function addRewards(uint256 _amount) external {
-        // require(
-        //     block.timestamp >= startDate && block.timestamp <= endDate,
-        //     "add rewards impossible!"
-        // );
+        require(
+            block.timestamp >= startDate && block.timestamp <= endDate,
+            "add rewards impossible!"
+        );
         totalRewards += _amount;
         rewards[block.timestamp] = _amount;
     }
