@@ -24,8 +24,6 @@ contract BlockSendRouter is Ownable {
     address private EURE_TOKEN_CONTRACT = 0x18ec0A6E18E5bc3784fDd3a3634b31245ab704F6;
     address private JEUR_TOKEN_CONTRACT = 0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c;
     address private USDC_TOKEN_CONTRACT = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
-    // address private BKSD_TOKEN_CONTRACT =
-    //     0x8d587d2Eaac88e6E228300180c921674a27ABFf3; // TODO: change this
 
     address private EUR_USD_AGGREGATOR = 0x73366Fe0AA0Ded304479862808e02506FE556a98;
     address private USDC_USD_AGGREGATOR = 0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7;
@@ -159,7 +157,6 @@ contract BlockSendRouter is Ownable {
     }
 
     function claimTransferRewards() external {
-        // TODO: Add a require if necessary to avoid claim small amount of BSKD
         uint256 amount = transferRewardsBalance[msg.sender];
         transferRewardsBalance[msg.sender] = 0;
         BKSDToken.mint(address(this), amount);

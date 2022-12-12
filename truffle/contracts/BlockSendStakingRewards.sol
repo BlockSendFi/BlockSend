@@ -86,8 +86,7 @@ contract BlockSendStakingRewards is Ownable {
         );
 
         //  We calculate the rewards and send them to the user
-        uint256 USDCRewards = (userPowerStaked[msg.sender] / totalPowers) *
-            totalRewards;
+        uint256 USDCRewards = totalPowers!=0 ? ((userPowerStaked[msg.sender] / totalPowers) * totalRewards) : 0;
         USDCToken.transfer(msg.sender, USDCRewards);
         emit WithdrawRewards(msg.sender, USDCRewards);
         rewardsAlreadyClaimed[msg.sender] = true;
@@ -102,8 +101,7 @@ contract BlockSendStakingRewards is Ownable {
 
         if (rewardsAlreadyClaimed[msg.sender] == false) {
             //  We calculate the rewards and send them to the user
-            uint256 USDCRewards = (userPowerStaked[msg.sender] / totalPowers) *
-                totalRewards;
+            uint256 USDCRewards = totalPowers!=0 ? ((userPowerStaked[msg.sender] / totalPowers) * totalRewards) : 0;
             USDCToken.transfer(msg.sender, USDCRewards);
             emit WithdrawRewards(msg.sender, USDCRewards);
             rewardsAlreadyClaimed[msg.sender] = true;
@@ -129,7 +127,6 @@ contract BlockSendStakingRewards is Ownable {
         router = _router;
     }
 
-    // TODO: Change the modifier here
     function addRewards(uint256 _amount) external {
         // require(
         //     block.timestamp >= startDate && block.timestamp <= endDate,
