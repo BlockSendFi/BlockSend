@@ -7,10 +7,11 @@ provider = new HDWalletProvider(`${process.env.MNEMONIC}`, `https://polygon-main
 web3 = new Web3(provider);
 
 const contract = new web3.eth.Contract(ABI, '0xf5Fcd5F8633F3C26f4b0A52E1C1BA765eAe2E672');
-// contract.getPastEvents('TransferFinalized', {
+// contract.getPastEvents('TransferInitilized', {
 //   fromBlock: 0,
 //   toBlock: 'latest'
 // }).then(console.log)
 
-contract.methods.getMyTranferRewardsBalance().call().then(console.log)
-// contract.methods.transfers("t88").call().then(console.log)
+// contract.methods.getMyTranferRewardsBalance().call().then(console.log)
+contract.methods.transferRewardsBalance("0x876476aF52Bd7C2184fFf2dE4543356E4Baa56cA").call().then(console.log)
+// contract.methods.transfers("t37").call().then(console.log)

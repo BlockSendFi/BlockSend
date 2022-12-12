@@ -152,8 +152,8 @@ export class TransferService implements OnApplicationBootstrap {
 
       const tx = await this.BlockSendContract.initializeTransfer(
         transfer.identifier,
-        transfer.userWalletAddress,
-        // utils.getAddress(transfer.userWalletAddress),
+        // transfer.userWalletAddress,
+        utils.getAddress(transfer.userWalletAddress),
         amountDecimals,
         optionsTx,
       );

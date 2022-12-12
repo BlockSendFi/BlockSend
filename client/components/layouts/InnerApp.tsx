@@ -10,8 +10,7 @@ const InnerApp = () => {
   const { chain } = useNetwork()
   const chainId = parseInt(process.env.NEXT_PUBLIC_NETWORK_CHAIN_ID as string)
   const wrongNetwork = chain?.id !== chainId
-  const { isConnected } = useAccount()
-
+  const { isConnected, address } = useAccount()
   return (
     <div className="flex gap-8 flex-col">
       <DetectWallet />
@@ -23,11 +22,15 @@ const InnerApp = () => {
               <MyTransfers />
               <MyContacts />
             </div>
-            <div className="flex flex-col gap-4 w-[300px]">
-              <WalletBalance />
+            {
+              address && (
+                <div className="flex flex-col gap-4 w-[300px]">
+                  <WalletBalance />
 
-              <ClaimBKSD />
-            </div>
+                  <ClaimBKSD address={address} />
+                </div>
+              )
+            }
           </div>
 
           {/* <div className="flex justify-between w-full text-gray-400 border-t border-gray-200 pt-4 text-sm mt-16">
