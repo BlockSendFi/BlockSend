@@ -104,6 +104,8 @@ npm run build
 We have three smart contracts that interact with each other, the SC BlockSendRouter is the only minter of the token so that we guarantee that the token is minted correctly when the user makes a claim of his rewards from the Router.
 The SC Router is also responsible for transferring the rewards that the stackers will share at the end of the stacking period
 
+![Smart Contracts exchanges](./docs/exchange.png)
+
 #### BlockSend Token
 
 An ERC20 stndard token that the users can claim as a rewards for their tranfers.
