@@ -186,12 +186,13 @@ export class TransferService implements OnApplicationBootstrap {
     const user = await this.userService.getUser(transfer.user);
 
     const offchainProviderParams = {
-      // mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
-      mode: 'sandbox',
+      mode: process.env.NODE_ENV === 'development' ? 'sandbox' : 'live',
       amount: transfer.amountWithoutFees / 1000000,
       transferTx: transfer.offchainTransferTx,
-      // We change the phoneNumber for the integration test
-      destination: { ...transfer.recipient, phoneNumber: '00000001' },
+      destination:
+        process.env.NODE_ENV === 'development'
+          ? { ...transfer.recipient, phoneNumber: '00000001' }
+          : transfer.recipient,
       origin: {
         firstName: user.firstName,
         lastName: user.lastName,
