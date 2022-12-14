@@ -54,10 +54,6 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
             <div className="font-semibold text-sm">{"Montant"}</div>
             <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value={transfer.amount.toFixed(2)} />
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold text-sm">{"Code de suivi (obligatoire)"}</div>
-            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="HE2OKAA3" />
-          </div>
         </div>
 
         <Button onClick={closeModal} className="w-full" title={"Fermer"} />
