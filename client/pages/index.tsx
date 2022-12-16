@@ -7,17 +7,38 @@ import { FaChevronDown } from 'react-icons/fa'
 import { useRouter } from 'next/router';
 import { useContractRead } from 'wagmi';
 import { BigNumber } from 'ethers';
+import FraudIcon from '../assets/fraud.svg'
+import AuditIcon from '../assets/audit.svg'
+import RegulatedIcon from '../assets/regulated.svg'
+import ProtectionIcon from '../assets/protection.svg'
+import SecureIcon from '../assets/secure.svg'
 
 const HOME_SECTIONS = [
   {
-    title: "Nos frais sont aussi bas que possible. Il n'y a pas de cotisations.",
+    title: "Des frais de transferts plus doux",
+    description: "Notre promesse est de permettre à nos clients de payer jusqu’à 3 fois moins cher leurs transferts d’argent à l’étranger.",
+    icon: RegulatedIcon
   },
   {
-    title: "Déménager et vivre à l'étranger devient beaucoup plus simple.",
+    title: "Régulièrement audité",
+    description: "Nous nous assurons que votre argent est en sécurité tout au long du processus de transfert d’argent par des audits de sécurité réguliers.",
+    icon: AuditIcon
   },
   {
-    title: "Faites des achats en ligne dans des boutiques à l'étranger.",
-  }
+    title: "Des transactions plus sécurisées",
+    description: "Nous nous basons sur la technologie blockhain afin d’assurer la  transparence totale et la sécurité absolue de vos transferts d’argent. ",
+    icon: SecureIcon
+  },
+  {
+    title: "Protection des données",
+    description: "Nous nous engageons à garder vos données personnelles en sécurité et nous sommes transparents dans la manière dont nous les recueillons, les traitons et les stockons.",
+    icon: ProtectionIcon
+  },
+  {
+    title: "Une équipe anti-fraude dédiée",
+    description: "Nous travaillons sans relâche pour protéger votre compte et votre argent des fraudes, y compris des plus sophistiquées. Un questionnaire KYC (Know your customer) robuste est nécessaire avant de pouvoir transférer les fonds.",
+    icon: FraudIcon
+  },
 ]
 
 const XOF_RATE = 655.957 // fixed rate defined the bank of france
@@ -152,7 +173,7 @@ const IndexPage = () => {
         </div>
       </div>
     }>
-      <div className="w-full">
+      <div className="w-full grid grid-cols-2 px-16 gap-16 py-16">
         {
           HOME_SECTIONS.map((section, index) => (
             <HomeSection section={section} key={index} />
