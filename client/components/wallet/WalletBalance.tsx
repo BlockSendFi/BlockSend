@@ -1,9 +1,9 @@
-import { BigNumber } from 'ethers';
+// import { BigNumber } from 'ethers';
 import Link from 'next/link';
 import React from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import Loader from '../common/Loader';
-import StakeBKSDButton from './StakeBKSDButton';
+// import StakeBKSDButton from './StakeBKSDButton';
 import StackedBKSD from './StakedBKSD';
 
 const WalletBalance = () => {
