@@ -44,11 +44,11 @@ const TransferDetailsModal: FC<Props> = ({ transferId }) => {
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
             <div className="font-semibold text-sm">{"IBAN"}</div>
-            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="FR82 2323 3498 3843" />
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="ES42 6849 0001 5500 0178 8138" />
           </div>
           <div className="flex flex-col gap-1">
             <div className="font-semibold text-sm">{"BIC"}</div>
-            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="BBK BANQUE FR" />
+            <input type="text" className="py-2 px-3 rounded-xl w-full bg-gray-200" disabled value="EASY PAYMENT AND FINANCE" />
           </div>
           <div className="flex flex-col gap-1">
             <div className="font-semibold text-sm">{"Montant"}</div>

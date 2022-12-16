@@ -42,10 +42,7 @@ const WalletBalance = () => {
             )
           }
 
-
-
-
-          {
+          {/* {
             !(data?.value as BigNumber).isZero() ? (
               <StakeBKSDButton balance={data?.value as BigNumber} />
             ) : (
@@ -53,7 +50,11 @@ const WalletBalance = () => {
                 <Link className="underline text-sm underline-offset-2" target="_blank" href={"https://mumbai.polygonscan.com/address/0x3c7ebddbe30e07472b7de2e9c739cef89ba6e079"}>{"Acheter du BKSD"}</Link>
               </div>
             )
-          }
+          } */}
+
+          <div className="text-center">
+            <Link className="underline text-sm underline-offset-2" target="_blank" href={"https://mumbai.polygonscan.com/address/0x3c7ebddbe30e07472b7de2e9c739cef89ba6e079"}>{"Acheter du BKSD"}</Link>
+          </div>
         </div>
       </div>
     </div>
